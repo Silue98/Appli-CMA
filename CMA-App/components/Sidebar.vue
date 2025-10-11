@@ -3,7 +3,7 @@
     <!-- Logo / Titre -->
     <div class="p-5 text-2xl font-extrabold tracking-wide flex items-center space-x-2 border-b border-white/10">
       <span>⛪</span>
-      <span>ÉgliseApp</span>
+      <span>CMA DOKUI 1</span>
     </div>
 
     <!-- Navigation -->
