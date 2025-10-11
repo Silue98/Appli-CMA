@@ -1,0 +1,98 @@
+// ---------------------------
+// DATABASE CONFIGURATION
+// ---------------------------
+datasource db {
+  provider = "mysql" // ou "mysql" / "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------
+// MODELS DE L'APPLICATION D'ÉGLISE
+// ---------------------------
+
+// ✅ MEMBRE DE L'ÉGLISE
+model Membre {
+  id             Int             @id @default(autoincrement())
+  nom            String
+  prenom         String
+  sexe           String
+  dateNaissance  DateTime?
+  contact        String?
+  email          String?
+  adresse        String?
+  dateInscription DateTime       @default(now())
+
+  // Relations
+  activites      ActiviteMembre[]
+  predications   Predication[]   @relation("PredicationParMembre")
+}
+
+// ✅ ACTIVITÉS D’UN MEMBRE
+model ActiviteMembre {
+  id           Int       @id @default(autoincrement())
+  membreId     Int
+  titre        String
+  description  String?
+  dateActivite DateTime
+
+  // Relations
+  membre       Membre    @relation(fields: [membreId], references: [id], onDelete: Cascade)
+}
+
+// ✅ UN CULTE (ex: culte de 08h, 10h, 12h)
+model Culte {
+  id             Int             @id @default(autoincrement())
+  dateCulte      DateTime
+  horaire        String           // ex: "08h00", "10h00", "12h00"
+  themePrincipal String?
+  predications   Predication[]
+  annonces       Annonce[]
+}
+
+// ✅ PREDICATIONS D'UN CULTE
+model Predication {
+  id             Int        @id @default(autoincrement())
+  culteId        Int
+  titre          String
+  texteBiblique  String
+  resume         String?
+  message        String?
+  predicateurId  Int
+
+  // Relations
+  culte          Culte      @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  predicateur    Membre     @relation("PredicationParMembre", fields: [predicateurId], references: [id])
+}
+
+// ✅ ANNONCES FAITES PENDANT UN CULTE
+model Annonce {
+  id                Int               @id @default(autoincrement())
+  culteId           Int
+  titre             String
+
+  // Sections du contenu
+  compteRendu       CompteRendu?
+  infosJour         String?
+  remerciements     String?
+  rappels           String?
+  commentaires      String?
+
+  // Relation
+  culte             Culte             @relation(fields: [culteId], references: [id], onDelete: Cascade)
+}
+
+// ✅ DÉTAILS DU COMPTE RENDU DU DERNIER CULTE
+model CompteRendu {
+  id               Int       @id @default(autoincrement())
+  annonceId        Int       @unique
+  messager         String
+  texteBiblique    String
+  assistanceTotale Int
+  theme            String
+
+  annonce          Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+}
