@@ -1,78 +1,52 @@
 <template>
-  <aside class="w-64 min-h-screen bg-gradient-to-b from-green-600 to-blue-700 text-white flex flex-col shadow-lg">
-    <!-- Logo / Titre -->
-    <div class="p-5 text-2xl font-extrabold tracking-wide flex items-center space-x-2 border-b border-white/10">
-      <span>⛪</span>
-      <span>CMA DOKUI 1</span>
+  <aside class="w-64 bg-gradient-to-b from-green-700 to-blue-700 text-white flex flex-col">
+    <div class="p-4 text-2xl font-bold text-white flex items-center gap-2">
+      ⛪ ÉgliseApp
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex-1 mt-4">
-      <ul class="space-y-2 p-2">
+    <nav class="flex-1">
+      <ul class="space-y-1 p-2">
         <li>
-          <NuxtLink
-            to="/"
-            class="flex items-center space-x-2 p-3 rounded-lg transition-all duration-200 hover:bg-white/15"
+          <button
+            @click="$emit('navigate', 'dashboard')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
           >
-            <i class="lucide-layout-dashboard text-white/80"></i>
-            <span>Dashboard</span>
-          </NuxtLink>
-        </li>
-
-        <li>
-          <NuxtLink
-            to="/membres"
-            class="flex items-center space-x-2 p-3 rounded-lg transition-all duration-200 hover:bg-white/15"
-          >
-            <i class="lucide-users text-white/80"></i>
-            <span>Membres</span>
-          </NuxtLink>
-        </li>
-
-        <li>
-          <NuxtLink
-            to="/activites"
-            class="flex items-center space-x-2 p-3 rounded-lg transition-all duration-200 hover:bg-white/15"
-          >
-            <i class="lucide-calendar text-white/80"></i>
-            <span>Activités</span>
-          </NuxtLink>
-        </li>
-
-        <li>
-          <NuxtLink
-            to="/finances"
-            class="flex items-center space-x-2 p-3 rounded-lg transition-all duration-200 hover:bg-white/15"
-          >
-            <i class="lucide-wallet text-white/80"></i>
-            <span>Finances</span>
-          </NuxtLink>
+            📊 Tableau de bord
+          </button>
         </li>
         <li>
-          <NuxtLink
-            to="/messages"
-            class="flex items-center space-x-2 p-3 rounded-lg transition-all duration-200 hover:bg-white/15"
+          <button
+            @click="$emit('navigate', 'membres')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
           >
-            <i class="lucide-message-square text-white/80"></i>
-            <span>Prédications</span>
-          </NuxtLink>
+            👥 Membres
+          </button>
         </li>
-
         <li>
-          <NuxtLink
-            to="/messages"
-            class="flex items-center space-x-2 p-3 rounded-lg transition-all duration-200 hover:bg-white/15"
+          <button
+            @click="$emit('navigate', 'activites')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
           >
-            <i class="lucide-message-square text-white/80"></i>
-            <span>Messages</span>
-          </NuxtLink>
+            🎯 Activités
+          </button>
+        </li>
+        <li>
+          <button
+            @click="$emit('navigate', 'finances')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
+          >
+            💰 Finances
+          </button>
+        </li>
+        <li>
+          <button
+            @click="$emit('navigate', 'messages')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
+          >
+            💬 Messages
+          </button>
         </li>
       </ul>
     </nav>
-
-    <!-- Pied du menu -->
-    <div class="p-4 text-sm text-white/70 border-t border-white/10">
-      © {{ new Date().getFullYear() }} CMA DOKUI 1
-    </div>
   </aside>
 </template>
