@@ -18,7 +18,15 @@
         <div v-if="activeSection === 'membres'">
           <MembersPanel />
         </div>
-
+        <div v-else-if="activeSection === 'cultes'">
+          <cultes-panel />
+        </div>
+        <div v-else-if="activeSection === 'annonces'">
+          <MembersPanel />
+        </div>
+        <div v-else-if="activeSection === 'predications'">
+          <predications-panel/>
+        </div>
         <div v-else-if="activeSection === 'activites'">
           <p class="text-gray-600 italic">📅 Gestion des activités (à venir)</p>
         </div>
@@ -41,6 +49,7 @@ import Sidebar from '~/components/Sidebar.vue'
 import Header from '~/components/Header.vue'
 import StatCard from '~/components/StatCard.vue'
 import MembersPanel from '~/components/MembersPanel.vue'
+import CultesPanel from '~/components/CultesPanel.vue'
 
 const activeSection = ref('dashboard')
 

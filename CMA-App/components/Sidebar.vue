@@ -22,6 +22,30 @@
             👥 Membres
           </button>
         </li>
+         <li>
+          <button
+            @click="$emit('navigate', 'cultes')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
+          >
+            👥 Cultes
+          </button>
+        </li>
+         <li>
+          <button
+            @click="$emit('navigate', 'predications')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
+          >
+            👥 Prédications
+          </button>
+        </li>
+         <li>
+          <button
+            @click="$emit('navigate', 'annonces')"
+            class="block w-full text-left p-2 rounded hover:bg-green-600 transition"
+          >
+            👥 Annonces
+          </button>
+        </li>
         <li>
           <button
             @click="$emit('navigate', 'activites')"

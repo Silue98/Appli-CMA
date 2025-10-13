@@ -22,6 +22,6 @@ const save = async () => {
 
 <style scoped>
 .input {
-  @apply p-2 border rounded-lg w-full focus:ring focus:ring-green-200;
+  /* @apply p-2 border rounded-lg w-full focus:ring focus:ring-green-200; */
 }
 </style>

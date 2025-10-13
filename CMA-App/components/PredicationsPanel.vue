@@ -1,66 +1,58 @@
 <template>
   <section class="w-full bg-white rounded-xl shadow p-6">
-    <!-- En-tête -->
+    <!-- 🧭 En-tête -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-      <h2 class="text-xl font-semibold text-green-700 flex items-center gap-2">
-        👥 Membres
+      <h2 class="text-xl font-semibold text-blue-700 flex items-center gap-2">
+        📖 Prédications
       </h2>
       <button
         @click="showForm = !showForm"
-        class="text-sm px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+        class="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
       >
-        {{ showForm ? 'Fermer' : '➕ Nouveau membre' }}
+        {{ showForm ? 'Fermer' : '➕ Nouvelle prédication' }}
       </button>
     </div>
 
-    <!-- Filtres & Recherche -->
+    <!-- 🔍 Filtres & Recherche -->
     <div class="flex flex-col md:flex-row gap-3 mb-4">
       <input
         v-model="search"
         type="text"
-        placeholder="🔍 Rechercher un membre..."
-        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+        placeholder="🔍 Rechercher une prédication..."
+        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
       <select
-        v-model="sexeFilter"
-        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-      >
-        <option value="">Tous les sexes</option>
-        <option value="Homme">Homme</option>
-        <option value="Femme">Femme</option>
-      </select>
-
-      <select
         v-model="sortField"
-        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
       >
         <option disabled value="">Trier par...</option>
-        <option value="nom">Nom</option>
-        <option value="prenom">Prénom</option>
+        <option value="titre">Titre</option>
+        <option value="texteBiblique">Texte biblique</option>
+        <option value="culte.themePrincipal">Culte</option>
       </select>
     </div>
 
-    <!-- Formulaire -->
+    <!-- 📝 Formulaire -->
     <div v-if="showForm" class="mb-4">
-      <MembreForm @saved="onSaved" />
+      <PredicationForm @saved="onSaved" />
     </div>
 
-    <!-- Tableau -->
+    <!-- 📋 Tableau -->
     <div>
       <DataTable
         v-if="!isLoading"
-        :headers="['Nom', 'Prénom', 'Sexe', 'Contact']"
-        :fields="['nom', 'prenom', 'sexe', 'contact']"
-        :items="paginatedMembres"
-        @delete="deleteMembre"
+        :headers="['Titre', 'Texte biblique', 'Culte', 'Prédicateur']"
+        :fields="['titre', 'texteBiblique', 'culte.themePrincipal', 'predicateur.nom']"
+        :items="paginatedPredications"
+        @delete="deletePredication"
       />
       <p v-else class="text-gray-500 italic">Chargement...</p>
     </div>
 
     <!-- 📄 Pagination -->
     <div
-      v-if="filteredAndSortedMembres.length > 0"
+      v-if="filteredAndSortedPredications.length > 0"
       class="flex items-center justify-between mt-6 flex-wrap gap-3"
     >
       <p class="text-sm text-gray-500">
@@ -90,62 +82,59 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import MembreForm from '~/components/MembreForm.vue'
+import PredicationForm from '~/components/PredicationForm.vue'
 import DataTable from '~/components/DataTable.vue'
 
 const showForm = ref(false)
-const membres = ref([])
+const predications = ref([])
 const isLoading = ref(true)
 const search = ref('')
-const sexeFilter = ref('')
 const sortField = ref('')
 
-// 🔢 Pagination
+// Pagination
 const currentPage = ref(1)
 const itemsPerPage = ref(5)
 
-const fetchMembres = async () => {
+// Charger les prédications
+const fetchPredications = async () => {
   try {
-    const res = await $fetch('/api/membres')
-    membres.value = res || []
+    const res = await $fetch('/api/predications?include=culte,predicateur')
+    predications.value = res || []
   } catch (err) {
     console.error(err)
   } finally {
     isLoading.value = false
   }
 }
-fetchMembres()
+fetchPredications()
 
+// Rafraîchir après enregistrement
 const onSaved = () => {
   showForm.value = false
-  fetchMembres()
+  fetchPredications()
 }
 
-// ❌ Suppression d’un membre
-const deleteMembre = async (item) => {
-  if (!confirm(`Supprimer ${item.nom} ${item.prenom} ?`)) return
-  await $fetch(`/api/membres/${item.id}`, { method: 'DELETE' })
-  fetchMembres()
+// Suppression
+const deletePredication = async (item) => {
+  if (!confirm(`Supprimer la prédication "${item.titre}" ?`)) return
+  await $fetch(`/api/predications/${item.id}`, { method: 'DELETE' })
+  fetchPredications()
 }
 
-// 🔍 Filtrage + Tri dynamique
-const filteredAndSortedMembres = computed(() => {
-  let result = membres.value
+// 🔍 Filtrage et tri
+const filteredAndSortedPredications = computed(() => {
+  let result = predications.value
 
-  // Filtrage recherche
+  // Recherche
   if (search.value) {
     const term = search.value.toLowerCase()
     result = result.filter(
-      (m) =>
-        m.nom?.toLowerCase().includes(term) ||
-        m.prenom?.toLowerCase().includes(term) ||
-        m.contact?.toLowerCase().includes(term)
+      (p) =>
+        p.titre?.toLowerCase().includes(term) ||
+        p.texteBiblique?.toLowerCase().includes(term) ||
+        p.culte?.themePrincipal?.toLowerCase().includes(term) ||
+        p.predicateur?.nom?.toLowerCase().includes(term)
     )
-  }
-
-  // Filtrage sexe
-  if (sexeFilter.value) {
-    result = result.filter((m) => m.sexe === sexeFilter.value)
   }
 
   // Tri
@@ -158,20 +147,19 @@ const filteredAndSortedMembres = computed(() => {
   return result
 })
 
-// 🧭 Pagination logique
+// Pagination
 const totalPages = computed(() =>
-  Math.ceil(filteredAndSortedMembres.value.length / itemsPerPage.value)
+  Math.ceil(filteredAndSortedPredications.value.length / itemsPerPage.value)
 )
 
-const paginatedMembres = computed(() => {
+const paginatedPredications = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
-  return filteredAndSortedMembres.value.slice(start, start + itemsPerPage.value)
+  return filteredAndSortedPredications.value.slice(start, start + itemsPerPage.value)
 })
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
-
 const prevPage = () => {
   if (currentPage.value > 1) currentPage.value--
 }
