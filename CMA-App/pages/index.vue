@@ -22,7 +22,7 @@
           <cultes-panel />
         </div>
         <div v-else-if="activeSection === 'annonces'">
-          <MembersPanel />
+          <AnnoncesPanel />
         </div>
         <div v-else-if="activeSection === 'predications'">
           <predications-panel/>

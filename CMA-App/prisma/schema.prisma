@@ -76,9 +76,9 @@ model Annonce {
 
   // Sections du contenu
   compteRendu       CompteRendu?
-  infosJour         String?
-  remerciements     String?
-  rappels           String?
+   infosJour         String?           @db.Text
+  remerciements     String?           @db.Text
+  rappels           String?           @db.Text
   commentaires      String?
 
   // Relation

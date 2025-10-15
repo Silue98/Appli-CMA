@@ -10,6 +10,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   vite: {
+     optimizeDeps: {
+      include: ['quill'],
+    },
     plugins: [
       tailwindcss(),
     ],

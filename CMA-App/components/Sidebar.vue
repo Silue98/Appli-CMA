@@ -1,7 +1,7 @@
 <template>
   <aside class="w-64 bg-gradient-to-b from-green-700 to-blue-700 text-white flex flex-col">
     <div class="p-4 text-2xl font-bold text-white flex items-center gap-2">
-      ⛪ ÉgliseApp
+      ⛪ CMA DOKUI1
     </div>
 
     <nav class="flex-1">
