@@ -29,32 +29,19 @@
       />
     </div>
 
-    <!-- Tableau avec slots personnalisés -->
+    <!-- Tableau des annonces -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Titre
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Culte ID
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Infos du jour
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Remerciements
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Rappels
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Commentaires
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Culte ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compte Rendu</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Infos du jour</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remerciements</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rappels</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaires</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -64,6 +51,9 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
               {{ annonce.culteId }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ formatCompteRendu(annonce.compteRendu) }}
             </td>
             <td class="px-6 py-4 text-sm text-gray-500">
               {{ truncateHTML(annonce.infosJour, 30) }}
@@ -125,6 +115,17 @@ const truncateHTML = (html, length) => {
   if (!html) return '-'
   const text = html.replace(/<[^>]*>/g, '')
   return text.length > length ? text.substring(0, length) + '...' : text
+}
+
+// Fonction pour formater le compte rendu dans le tableau
+const formatCompteRendu = (compteRendu) => {
+  if (!compteRendu) return '-'
+  
+  const parts = []
+  if (compteRendu.messager) parts.push(`📖:${compteRendu.messager.substring(0, 15)}...`)
+  if (compteRendu.assistanceTotale) parts.push(`👥:${compteRendu.assistanceTotale}`)
+  
+  return parts.length > 0 ? parts.join(' ') : 'Compte rendu'
 }
 
 // Gestion après sauvegarde
@@ -234,6 +235,25 @@ const printSingleAnnonce = (annonce) => {
           </div>
         </div>
 
+        <!-- COMPTE RENDU EN PREMIER -->
+        ${annonce.compteRendu ? `
+          <div class="print-section">
+            <h2>📊 Compte Rendu du Culte Précédent</h2>
+            <div class="print-compte-rendu">
+              ${annonce.compteRendu.messager ? `<p><strong>📖 Messager:</strong> ${annonce.compteRendu.messager}</p>` : ''}
+              ${annonce.compteRendu.texteBiblique ? `<p><strong>✝️ Texte Biblique:</strong> ${annonce.compteRendu.texteBiblique}</p>` : ''}
+              ${annonce.compteRendu.assistanceTotale ? `<p><strong>👥 Assistance Totale:</strong> ${annonce.compteRendu.assistanceTotale} personnes</p>` : ''}
+              ${annonce.compteRendu.theme ? `<p><strong>🎯 Thème du Culte:</strong> ${annonce.compteRendu.theme}</p>` : ''}
+            </div>
+          </div>
+        ` : `
+          <div class="print-section">
+            <h2>📊 Compte Rendu du Culte Précédent</h2>
+            <div class="empty-section">Aucun compte rendu disponible</div>
+          </div>
+        `}
+
+        <!-- PUIS INFORMATIONS DU JOUR -->
         ${annonce.infosJour ? `
           <div class="print-section">
             <h2>📅 Informations du Jour</h2>
@@ -282,23 +302,6 @@ const printSingleAnnonce = (annonce) => {
           </div>
         `}
 
-        ${annonce.compteRendu ? `
-          <div class="print-section">
-            <h2>📊 Compte Rendu du Culte Précédent</h2>
-            <div class="print-compte-rendu">
-              ${annonce.compteRendu.messager ? `<p><strong>📖 Messager:</strong> ${annonce.compteRendu.messager}</p>` : ''}
-              ${annonce.compteRendu.texteBiblique ? `<p><strong>✝️ Texte Biblique:</strong> ${annonce.compteRendu.texteBiblique}</p>` : ''}
-              ${annonce.compteRendu.assistanceTotale ? `<p><strong>👥 Assistance Totale:</strong> ${annonce.compteRendu.assistanceTotale} personnes</p>` : ''}
-              ${annonce.compteRendu.theme ? `<p><strong>🎯 Thème du Culte:</strong> ${annonce.compteRendu.theme}</p>` : ''}
-            </div>
-          </div>
-        ` : `
-          <div class="print-section">
-            <h2>📊 Compte Rendu du Culte Précédent</h2>
-            <div class="empty-section">Aucun compte rendu disponible</div>
-          </div>
-        `}
-
         <div style="margin-top: 40px; text-align: center; color: #666; font-size: 12px;">
           <p>Document généré automatiquement - ${currentDate}</p>
         </div>
@@ -311,7 +314,6 @@ const printSingleAnnonce = (annonce) => {
   
   setTimeout(() => {
     printWindow.print()
-    // printWindow.close() // Décommentez pour fermer automatiquement après impression
   }, 500)
 }
 
@@ -439,6 +441,19 @@ const printAllAnnonces = () => {
               <span class="print-culte-id">Culte #${annonce.culteId}</span>
             </div>
 
+            <!-- COMPTE RENDU EN PREMIER -->
+            ${annonce.compteRendu ? `
+              <div class="print-section">
+                <h3>📊 Compte rendu</h3>
+                <div class="print-compte-rendu">
+                  ${annonce.compteRendu.messager ? `<p><strong>Messager:</strong> ${annonce.compteRendu.messager}</p>` : ''}
+                  ${annonce.compteRendu.texteBiblique ? `<p><strong>Texte biblique:</strong> ${annonce.compteRendu.texteBiblique}</p>` : ''}
+                  ${annonce.compteRendu.assistanceTotale ? `<p><strong>Assistance:</strong> ${annonce.compteRendu.assistanceTotale}</p>` : ''}
+                  ${annonce.compteRendu.theme ? `<p><strong>Thème:</strong> ${annonce.compteRendu.theme}</p>` : ''}
+                </div>
+              </div>
+            ` : ''}
+
             ${annonce.infosJour ? `
               <div class="print-section">
                 <h3>📅 Informations du jour</h3>
@@ -464,18 +479,6 @@ const printAllAnnonces = () => {
               <div class="print-section">
                 <h3>💬 Commentaires</h3>
                 <div>${annonce.commentaires}</div>
-              </div>
-            ` : ''}
-
-            ${annonce.compteRendu ? `
-              <div class="print-section">
-                <h3>📊 Compte rendu</h3>
-                <div class="print-compte-rendu">
-                  ${annonce.compteRendu.messager ? `<p><strong>Messager:</strong> ${annonce.compteRendu.messager}</p>` : ''}
-                  ${annonce.compteRendu.texteBiblique ? `<p><strong>Texte biblique:</strong> ${annonce.compteRendu.texteBiblique}</p>` : ''}
-                  ${annonce.compteRendu.assistanceTotale ? `<p><strong>Assistance:</strong> ${annonce.compteRendu.assistanceTotale}</p>` : ''}
-                  ${annonce.compteRendu.theme ? `<p><strong>Thème:</strong> ${annonce.compteRendu.theme}</p>` : ''}
-                </div>
               </div>
             ` : ''}
 
