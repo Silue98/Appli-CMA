@@ -59,8 +59,8 @@ model Predication {
   culteId        Int
   titre          String
   texteBiblique  String
-  resume         String?
-  message        String?
+  resume         String?  @db.Text
+  message        String? @db.Text
   predicateurId  Int
 
   // Relations
