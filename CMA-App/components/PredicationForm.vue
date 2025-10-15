@@ -1,7 +1,7 @@
 <template>
   <form
     @submit.prevent="savePredication"
-    class="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-4"
+    class="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-6"
   >
     <!-- 🕊️ Titre et texte biblique -->
     <div class="grid md:grid-cols-2 gap-4">
@@ -28,26 +28,50 @@
       </div>
     </div>
 
-    <!-- 🧾 Résumé -->
+    <!-- 🧾 Résumé (Rich Text) -->
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Résumé</label>
-      <textarea
-        v-model="form.resume"
-        placeholder="Résumé court du message..."
-        rows="3"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-      ></textarea>
+      <ClientOnly>
+        <component
+          :is="QuillEditor"
+          v-if="QuillEditor"
+          v-model:content="form.resume"
+          content-type="html"
+          theme="snow"
+          placeholder="Résumé court du message..."
+          class="rich-editor"
+        />
+        <textarea
+          v-else
+          v-model="form.resume"
+          placeholder="Résumé court du message..."
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        ></textarea>
+      </ClientOnly>
     </div>
 
-    <!-- 📖 Message -->
+    <!-- 📖 Message (Rich Text) -->
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-      <textarea
-        v-model="form.message"
-        placeholder="Contenu principal ou points du message..."
-        rows="5"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-      ></textarea>
+      <ClientOnly>
+        <component
+          :is="QuillEditor"
+          v-if="QuillEditor"
+          v-model:content="form.message"
+          content-type="html"
+          theme="snow"
+          placeholder="Contenu principal ou points du message..."
+          class="rich-editor"
+        />
+        <textarea
+          v-else
+          v-model="form.message"
+          placeholder="Contenu principal ou points du message..."
+          rows="5"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        ></textarea>
+      </ClientOnly>
     </div>
 
     <!-- 🔗 Sélections liées -->
@@ -61,7 +85,7 @@
         >
           <option value="">-- Sélectionner un culte --</option>
           <option v-for="c in cultes" :key="c.id" :value="c.id">
-            {{ c.themePrincipal }} - {{ c.dateCulte }}
+            {{ c.themePrincipal }} - {{ formatDate(c.dateCulte) }}
           </option>
         </select>
       </div>
@@ -81,20 +105,20 @@
       </div>
     </div>
 
-    <!-- 🧩 Bouton d’action -->
+    <!-- 🧩 Bouton d'action -->
     <div class="flex justify-end mt-6">
       <button
         type="submit"
         class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
       >
-        💾 Enregistrer
+        💾 Enregistrer la prédication
       </button>
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, shallowRef } from 'vue'
 
 // 🔹 Données du formulaire
 const form = ref({
@@ -109,6 +133,9 @@ const form = ref({
 // 🔹 Données liées
 const cultes = ref([])
 const membres = ref([])
+
+// 🔹 Éditeur Quill
+const QuillEditor = shallowRef(null)
 
 const emit = defineEmits(['saved'])
 
@@ -125,7 +152,35 @@ const loadData = async () => {
     console.error('Erreur lors du chargement des données liées :', err)
   }
 }
-onMounted(loadData)
+
+// 🔄 Charger l'éditeur Quill
+const loadQuillEditor = async () => {
+  if (process.client) {
+    try {
+      const module = await import('@vueup/vue-quill')
+      QuillEditor.value = module.QuillEditor
+      await import('@vueup/vue-quill/dist/vue-quill.snow.css')
+    } catch (error) {
+      console.error('Erreur lors du chargement de Quill:', error)
+    }
+  }
+}
+
+onMounted(() => {
+  loadData()
+  loadQuillEditor()
+})
+
+// 📅 Formater la date
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
 
 // 💾 Enregistrer une prédication
 const savePredication = async () => {
@@ -138,7 +193,7 @@ const savePredication = async () => {
     emit('saved')
     resetForm()
   } catch (err) {
-    console.error('Erreur à l’enregistrement :', err)
+    console.error('Erreur à l\'enregistrement :', err)
     alert('❌ Une erreur est survenue.')
   }
 }
@@ -155,3 +210,9 @@ const resetForm = () => {
   }
 }
 </script>
+
+<style scoped>
+.rich-editor {
+  /* @apply bg-white border border-gray-300 rounded-lg min-h-[150px]; */
+}
+</style>
