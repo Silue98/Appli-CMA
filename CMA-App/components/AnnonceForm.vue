@@ -1,143 +1,136 @@
 <template>
   <form
-    @submit.prevent="savePredication"
-    class="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-6"
+    @submit.prevent="save"
+    class="bg-white p-4 shadow rounded-xl mb-4 space-y-6 border border-gray-100"
   >
-    <!-- 🕊️ Titre et texte biblique -->
-    <div class="grid md:grid-cols-2 gap-4">
+    <!-- 🏷️ Informations générales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+        <label class="block text-sm font-semibold mb-1 text-gray-700">Titres</label>
         <input
           v-model="form.titre"
-          type="text"
-          placeholder="Ex: La foi qui déplace les montagnes"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Titre de l'annonce"
+          class="input"
           required
         />
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Texte biblique</label>
+        <label class="block text-sm font-semibold mb-1 text-gray-700">Culte associé</label>
         <input
-          v-model="form.texteBiblique"
-          type="text"
-          placeholder="Ex: Matthieu 17:20"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          v-model.number="form.culteId"
+          placeholder="ID du culte"
+          type="number"
+          class="input"
           required
         />
       </div>
     </div>
 
-    <!-- 🧾 Résumé (Rich Text) -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Résumé</label>
+    <!-- 🧾 Compte rendu (EN PREMIER) -->
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold text-blue-700 mb-2">
+        📊 Compte Rendu du Culte Précédent
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input
+          v-model="form.compteRendu.messager"
+          placeholder="Messager"
+          class="input"
+        />
+        <input
+          v-model="form.compteRendu.texteBiblique"
+          placeholder="Texte biblique"
+          class="input"
+        />
+        <input
+          v-model.number="form.compteRendu.assistanceTotale"
+          placeholder="Assistance totale"
+          type="number"
+          class="input"
+        />
+        <input
+          v-model="form.compteRendu.theme"
+          placeholder="Thème du culte précédent"
+          class="input"
+        />
+      </div>
+    </div>
+
+    <!-- 📝 Champs riches -->
+    <div v-for="(label, key) in textFields" :key="key">
+      <label class="block text-sm font-semibold mb-1 text-gray-700">{{ label }}</label>
       <ClientOnly>
         <component
           :is="QuillEditor"
           v-if="QuillEditor"
-          v-model:content="form.resume"
+          v-model:content="form[key]"
           content-type="html"
           theme="snow"
-          placeholder="Résumé court du message..."
+          :placeholder="`Rédige ${label.toLowerCase()}...`"
           class="rich-editor"
         />
         <textarea
           v-else
-          v-model="form.resume"
-          placeholder="Résumé court du message..."
-          rows="3"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        ></textarea>
-      </ClientOnly>
-    </div>
-
-    <!-- 📖 Message (Rich Text) -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-      <ClientOnly>
-        <component
-          :is="QuillEditor"
-          v-if="QuillEditor"
-          v-model:content="form.message"
-          content-type="html"
-          theme="snow"
-          placeholder="Contenu principal ou points du message..."
-          class="rich-editor"
+          v-model="form[key]"
+          class="input min-h-[150px]"
+          :placeholder="label"
         />
-        <textarea
-          v-else
-          v-model="form.message"
-          placeholder="Contenu principal ou points du message..."
-          rows="5"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        ></textarea>
       </ClientOnly>
     </div>
 
-    <!-- 🔗 Sélections liées -->
-    <div class="grid md:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Culte</label>
-        <select
-          v-model="form.culteId"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
-        >
-          <option value="">-- Sélectionner un culte --</option>
-          <option v-for="c in cultes" :key="c.id" :value="c.id">
-            {{ c.themePrincipal }} - {{ formatDate(c.dateCulte) }}
-          </option>
-        </select>
-      </div>
+    <!-- 💾 Boutons -->
+    <div class="flex justify-end space-x-3 mt-6">
+      <button
+        type="button"
+        @click="emit('close')"
+        class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+      >
+        ❌ Fermer
+      </button>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Prédicateur</label>
-        <select
-          v-model="form.predicateurId"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          required
-        >
-          <option value="">-- Sélectionner un prédicateur --</option>
-          <option v-for="m in membres" :key="m.id" :value="m.id">
-            {{ m.nom }} {{ m.prenom }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 🧩 Bouton d'action -->
-    <div class="flex justify-end mt-6">
       <button
         type="submit"
-        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
       >
-        💾 Enregistrer la prédication
+        💾 Enregistrer
       </button>
     </div>
   </form>
 </template>
 
-<script setup>
-import { ref, onMounted, shallowRef } from 'vue'
+<script setup lang="ts">
+import { reactive, shallowRef, onMounted } from 'vue'
 
-// 🔹 Données du formulaire
-const form = ref({
+// Événements envoyés au parent
+const emit = defineEmits(['saved', 'close'])
+
+const form = reactive({
   titre: '',
-  texteBiblique: '',
-  resume: '',
-  message: '',
   culteId: '',
-  predicateurId: '',
+  infosJour: '',
+  remerciements: '',
+  rappels: '',
+  commentaires: '',
+  compteRendu: {
+    messager: '',
+    texteBiblique: '',
+    assistanceTotale: null,
+    theme: ''
+  }
 })
 
-// 🔹 Données liées
-const cultes = ref([])
-const membres = ref([])
-
-// 🔹 Éditeur Quill
-const QuillEditor = shallowRef(null)
+// Dictionnaire des champs "rich text"
+const textFields = {
+  infosJour: '📅 Informations du Jour',
+  remerciements: '🙏 Remerciements',
+  rappels: '🔔 Rappels Importants',
+  commentaires: '💬 Commentaires & Annotations'
+}
 
 // Chargement dynamique de l'éditeur Quill
+const QuillEditor = shallowRef(null)
+
 onMounted(async () => {
   if (process.client) {
     const module = await import('@vueup/vue-quill')
@@ -146,68 +139,45 @@ onMounted(async () => {
   }
 })
 
-const emit = defineEmits(['saved'])
-
-// 🔄 Charger cultes et membres
-const loadData = async () => {
+// Fonction d'enregistrement
+const save = async () => {
   try {
-    const [cultesData, membresData] = await Promise.all([
-      $fetch('/api/cultes'),
-      $fetch('/api/membres'),
-    ])
-    cultes.value = cultesData || []
-    membres.value = membresData || []
-  } catch (err) {
-    console.error('Erreur lors du chargement des données liées :', err)
-  }
-}
-
-onMounted(() => {
-  loadData()
-})
-
-// 📅 Formater la date
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}
-
-// 💾 Enregistrer une prédication
-const savePredication = async () => {
-  try {
-    await $fetch('/api/predications', {
+    await $fetch('/api/annonces', {
       method: 'POST',
-      body: form.value,
+      body: form
     })
-    alert('✅ Prédication enregistrée avec succès !')
+    alert('✅ Annonce enregistrée avec succès !')
+
+    // Reset du formulaire
+    Object.assign(form, {
+      titre: '',
+      culteId: '',
+      infosJour: '',
+      remerciements: '',
+      rappels: '',
+      commentaires: '',
+      compteRendu: {
+        messager: '',
+        texteBiblique: '',
+        assistanceTotale: null,
+        theme: ''
+      }
+    })
+
     emit('saved')
-    resetForm()
   } catch (err) {
     console.error('Erreur à l\'enregistrement :', err)
     alert('❌ Une erreur est survenue.')
   }
 }
-
-// 🧼 Réinitialiser le formulaire
-const resetForm = () => {
-  form.value = {
-    titre: '',
-    texteBiblique: '',
-    resume: '',
-    message: '',
-    culteId: '',
-    predicateurId: '',
-  }
-}
 </script>
 
 <style scoped>
-.rich-editor {
-  /* @apply bg-white border border-gray-300 rounded-lg min-h-[150px]; */
-}
+/* .input {
+  @apply p-2 border border-gray-300 rounded-lg w-full focus:ring focus:ring-green-200;
+} */
+
+/* .rich-editor {
+  @apply bg-white border border-gray-300 rounded-lg min-h-[150px];
+} */
 </style>

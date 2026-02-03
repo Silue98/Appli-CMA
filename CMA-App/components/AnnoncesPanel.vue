@@ -11,7 +11,6 @@
         >
           🖨️ Tout imprimer
         </button>
-
         <button
           @click="showForm = !showForm"
           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
