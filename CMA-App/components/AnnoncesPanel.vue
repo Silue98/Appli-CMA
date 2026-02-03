@@ -457,9 +457,9 @@ const printSingleAnnonce = (annonce) => {
   printWindow.document.write(printHTML)
   printWindow.document.close()
   
-  setTimeout(() => {
-    printWindow.print()
-  }, 500)
+  // setTimeout(() => {
+  //   printWindow.print()
+  // }, 500)
 }
 
 // Édition d'une annonce
@@ -636,9 +636,9 @@ const printAllAnnonces = () => {
   printWindow.document.write(printHTML)
   printWindow.document.close()
   
-  setTimeout(() => {
-    printWindow.print()
-  }, 500)
+  // setTimeout(() => {
+  //   printWindow.print()
+  // }, 500)
 }
 </script>
 
