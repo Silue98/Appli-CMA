@@ -111,6 +111,30 @@
               🎯 Activités
             </button>
           </li>
+          
+ <li>
+            <button
+              @click="navigateAndClose('annonces')"
+              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+              </svg>
+              📢 Annonces
+            </button>
+          </li>
+          <li>
+            <button
+              @click="navigateAndClose('activites')"
+              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              🎯 Activités
+            </button>
+          </li>
+
           <li>
             <button
               @click="navigateAndClose('finances')"

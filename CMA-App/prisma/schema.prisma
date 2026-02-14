@@ -34,6 +34,53 @@ model Membre {
   activites      ActiviteMembre[]
   predications   Predication[]   @relation("PredicationParMembre")
 }
+//
+model ProgrammeCulte {
+  id                    Int           @id @default(autoincrement())
+  date                  DateTime      @unique
+  semaine               String?
+  typeCulte             String?
+  theme                 String?
+  
+  // Cantiques
+  cantiqueFrancais      String?
+  cantiqueBaoule        String?
+  cantiqueFrancaisRef   String?
+  cantiqueBaouleRef     String?
+  
+  // Structure pour chaque rôle dans chaque culte
+  roles                 RoleProgramme[]
+  
+  // Informations générales
+  notes                 String?
+  status                String        @default("planifié")
+  
+  // Responsable
+  planificateur         Membre?       @relation(fields: [planificateurId], references: [id])
+  planificateurId       Int?
+  
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+model RoleProgramme {
+  id              Int             @id @default(autoincrement())
+  programmeId     Int
+  programme       ProgrammeCulte  @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  
+  culteType       String          // "premier", "deuxieme", "troisieme"
+  role            String          // "preside", "annonce", "predicateur", "accueil", "musique", "collecte"
+  heure           String?         // Heure spécifique pour ce rôle dans ce culte
+  
+  membre          Membre?         @relation(fields: [membreId], references: [id])
+  membreId        Int?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@unique([programmeId, culteType, role])
+}
+
 
 // ✅ ACTIVITÉS D’UN MEMBRE
 model ActiviteMembre {
