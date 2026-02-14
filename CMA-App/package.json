@@ -1,15 +1,14 @@
 {
   "name": "CMA-App",
   "type": "module",
-  "private": true,
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "vercel-build": "prisma generate && prisma migrate deploy nuxt build"
-  },
+  "private": true,"scripts": {
+  "build": "prisma generate && prisma migrate deploy && nuxt build",
+  "dev": "nuxt dev",
+  "generate": "nuxt generate",
+  "preview": "nuxt preview",
+  "postinstall": "prisma generate"
+},
+
   "dependencies": {
     "@prisma/client": "^6.17.1",
     "@tailwindcss/vite": "^4.1.14",
