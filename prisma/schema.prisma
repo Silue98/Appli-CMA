@@ -33,6 +33,8 @@ model Membre {
   // Relations
   activites      ActiviteMembre[]
   predications   Predication[]   @relation("PredicationParMembre")
+  programmesPlanifies ProgrammeCulte[] @relation("ProgrammePlanificateur")
+  rolesProgrammes RoleProgramme[]
 }
 //
 model ProgrammeCulte {
@@ -56,7 +58,7 @@ model ProgrammeCulte {
   status                String        @default("planifié")
   
   // Responsable
-  planificateur         Membre?       @relation(fields: [planificateurId], references: [id])
+  planificateur         Membre?       @relation("ProgrammePlanificateur", fields: [planificateurId], references: [id])
   planificateurId       Int?
   
   createdAt             DateTime      @default(now())
