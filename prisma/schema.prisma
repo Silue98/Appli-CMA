@@ -37,25 +37,25 @@ enum TypeCulte {
 // ---------------------------
 
 model Membre {
-  id                    Int       @id @default(autoincrement())
-  nom                   String
-  prenom                String
-  sexe                  Sexe
-  dateNaissance         DateTime?
-  contact               String?
-  email                 String?   @unique
-  adresse               String?
+  id            Int       @id @default(autoincrement())
+  nom           String
+  prenom        String
+  sexe          Sexe
+  dateNaissance DateTime?
+  contact       String?
+  email         String?   @unique
+  adresse       String?
   situationMatrimoniale String?
-  dateEntreeDepartement DateTime?
-  profession            String?
-  activiteAuSeinDP      String?
-  dateInscription       DateTime  @default(now())
+  dateEntreeDepartement  DateTime?
+  profession    String?
+  activiteAuSeinDP String?
+  dateInscription DateTime @default(now())
 
   // Relations
-  activites           ActiviteMembre[]
-  predications        Predication[]    @relation("PredicationParMembre")
-  programmesPlanifies ProgrammeCulte[] @relation("PlanificateurProgramme")
-  rolesAttribues      RoleProgramme[]
+  activites            ActiviteMembre[]
+  predications         Predication[] @relation("PredicationParMembre")
+  programmesPlanifies  ProgrammeCulte[] @relation("PlanificateurProgramme")
+  rolesAttribues       RoleProgramme[]
 }
 
 // ---------------------------
@@ -63,29 +63,29 @@ model Membre {
 // ---------------------------
 
 model ProgrammeCulte {
-  id        Int      @id @default(autoincrement())
-  date      DateTime @unique
-  semaine   String?
-  typeCulte String?
-  theme     String?
+  id              Int       @id @default(autoincrement())
+  date            DateTime  @unique
+  semaine         String?
+  typeCulte       String?
+  theme           String?
 
   cantiqueFrancais    String?
   cantiqueBaoule      String?
   cantiqueFrancaisRef String?
   cantiqueBaouleRef   String?
 
-  notes  String?         @db.Text
-  status StatusProgramme @default(PLANIFIE)
+  notes           String? @db.Text
+  status          StatusProgramme @default(PLANIFIE)
 
   // Responsable (relation nommée)
   planificateur   Membre? @relation("PlanificateurProgramme", fields: [planificateurId], references: [id])
   planificateurId Int?
 
   // Relations
-  roles RoleProgramme[]
+  roles       RoleProgramme[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // ---------------------------
@@ -93,20 +93,20 @@ model ProgrammeCulte {
 // ---------------------------
 
 model RoleProgramme {
-  id Int @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
 
   programmeId Int
   programme   ProgrammeCulte @relation(fields: [programmeId], references: [id], onDelete: Cascade)
 
-  culteType TypeCulte
-  role      String
-  heure     String?
+  culteType   TypeCulte
+  role        String
+  heure       String?
 
-  membreId Int?
-  membre   Membre? @relation(fields: [membreId], references: [id])
+  membreId    Int?
+  membre      Membre? @relation(fields: [membreId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@unique([programmeId, culteType, role])
 }
@@ -122,7 +122,7 @@ model ActiviteMembre {
   description  String?
   dateActivite DateTime
 
-  membre Membre @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membre       Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
 }
 
 // ---------------------------
@@ -135,8 +135,8 @@ model Culte {
   horaire        String
   themePrincipal String?
 
-  predications Predication[]
-  annonces     Annonce[]
+  predications   Predication[]
+  annonces       Annonce[]
 }
 
 // ---------------------------
@@ -144,12 +144,12 @@ model Culte {
 // ---------------------------
 
 model Predication {
-  id            Int     @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   culteId       Int
   titre         String
   texteBiblique String
-  resume        String? @db.Text
-  message       String? @db.Text
+  resume        String?  @db.Text
+  message       String?  @db.Text
   predicateurId Int
 
   culte       Culte  @relation(fields: [culteId], references: [id], onDelete: Cascade)
@@ -161,18 +161,18 @@ model Predication {
 // ---------------------------
 
 model Annonce {
-  id      Int    @id @default(autoincrement())
-  culteId Int
-  titre   String
+  id            Int      @id @default(autoincrement())
+  culteId       Int
+  titre         String
 
   infosJour     String? @db.Text
   remerciements String? @db.Text
   rappels       String? @db.Text
   commentaires  String?
 
-  compteRendu CompteRendu?
+  compteRendu   CompteRendu?
 
-  culte Culte @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  culte         Culte   @relation(fields: [culteId], references: [id], onDelete: Cascade)
 }
 
 // ---------------------------
@@ -180,12 +180,12 @@ model Annonce {
 // ---------------------------
 
 model CompteRendu {
-  id               Int    @id @default(autoincrement())
-  annonceId        Int    @unique
+  id               Int      @id @default(autoincrement())
+  annonceId        Int      @unique
   messager         String
   texteBiblique    String
   assistanceTotale Int
   theme            String
 
-  annonce Annonce @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+  annonce          Annonce  @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
