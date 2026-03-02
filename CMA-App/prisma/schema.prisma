@@ -2,8 +2,8 @@
 // DATABASE CONFIGURATION
 // ---------------------------
 datasource db {
-  provider = "mysql" // ou "mysql" / "sqlite"
-  url= env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -11,139 +11,181 @@ generator client {
 }
 
 // ---------------------------
-// MODELS DE L'APPLICATION D'ÉGLISE
+// ENUMS (BONNES PRATIQUES)
 // ---------------------------
 
-// ✅ MEMBRE DE L'ÉGLISE
+enum Sexe {
+  HOMME
+  FEMME
+}
+
+enum StatusProgramme {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum TypeCulte {
+  PREMIER
+  DEUXIEME
+  TROISIEME
+}
+
+// ---------------------------
+// MEMBRE
+// ---------------------------
+
 model Membre {
-  id             Int             @id @default(autoincrement())
-  nom            String
-  prenom         String
-  sexe           String
-  dateNaissance  String?
-  contact        String?
-  email          String?
-  adresse        String?
-  SituationMatriMoniale String?
-  DateEntreAuDepartementCulte        String?
-  Profession          String?
-  ActiviteAuSeinDP       String?
-  dateInscription DateTime       @default(now())
+  id                    Int       @id @default(autoincrement())
+  nom                   String
+  prenom                String
+  sexe                  Sexe
+  dateNaissance         DateTime?
+  contact               String?
+  email                 String?   @unique
+  adresse               String?
+  situationMatrimoniale String?
+  dateEntreeDepartement DateTime?
+  profession            String?
+  activiteAuSeinDP      String?
+  dateInscription       DateTime  @default(now())
 
   // Relations
-  activites      ActiviteMembre[]
-  predications   Predication[]   @relation("PredicationParMembre")
-}
-//
-model ProgrammeCulte {
-  id                    Int           @id @default(autoincrement())
-  date                  DateTime      @unique
-  semaine               String?
-  typeCulte             String?
-  theme                 String?
-  
-  // Cantiques
-  cantiqueFrancais      String?
-  cantiqueBaoule        String?
-  cantiqueFrancaisRef   String?
-  cantiqueBaouleRef     String?
-  
-  // Structure pour chaque rôle dans chaque culte
-  roles                 RoleProgramme[]
-  
-  // Informations générales
-  notes                 String?
-  status                String        @default("planifié")
-  
-  // Responsable
-  planificateur         Membre?       @relation(fields: [planificateurId], references: [id])
-  planificateurId       Int?
-  
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
+  activites           ActiviteMembre[]
+  predications        Predication[]    @relation("PredicationParMembre")
+  programmesPlanifies ProgrammeCulte[] @relation("PlanificateurProgramme")
+  rolesAttribues      RoleProgramme[]
 }
 
+// ---------------------------
+// PROGRAMME DE CULTE
+// ---------------------------
+
+model ProgrammeCulte {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @unique
+  semaine   String?
+  typeCulte String?
+  theme     String?
+
+  cantiqueFrancais    String?
+  cantiqueBaoule      String?
+  cantiqueFrancaisRef String?
+  cantiqueBaouleRef   String?
+
+  notes  String?         @db.Text
+  status StatusProgramme @default(PLANIFIE)
+
+  // Responsable (relation nommée)
+  planificateur   Membre? @relation("PlanificateurProgramme", fields: [planificateurId], references: [id])
+  planificateurId Int?
+
+  // Relations
+  roles RoleProgramme[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------
+// ROLES DANS UN PROGRAMME
+// ---------------------------
+
 model RoleProgramme {
-  id              Int             @id @default(autoincrement())
-  programmeId     Int
-  programme       ProgrammeCulte  @relation(fields: [programmeId], references: [id], onDelete: Cascade)
-  
-  culteType       String          // "premier", "deuxieme", "troisieme"
-  role            String          // "preside", "annonce", "predicateur", "accueil", "musique", "collecte"
-  heure           String?         // Heure spécifique pour ce rôle dans ce culte
-  
-  membre          Membre?         @relation(fields: [membreId], references: [id])
-  membreId        Int?
-  
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  
+  id Int @id @default(autoincrement())
+
+  programmeId Int
+  programme   ProgrammeCulte @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+
+  culteType TypeCulte
+  role      String
+  heure     String?
+
+  membreId Int?
+  membre   Membre? @relation(fields: [membreId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([programmeId, culteType, role])
 }
 
+// ---------------------------
+// ACTIVITÉS D’UN MEMBRE
+// ---------------------------
 
-// ✅ ACTIVITÉS D’UN MEMBRE
 model ActiviteMembre {
-  id           Int       @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   membreId     Int
   titre        String
   description  String?
   dateActivite DateTime
 
-  // Relations
-  membre       Membre    @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membre Membre @relation(fields: [membreId], references: [id], onDelete: Cascade)
 }
 
-// ✅ UN CULTE (ex: culte de 08h, 10h, 12h)
+// ---------------------------
+// CULTE (08H / 10H / 12H)
+// ---------------------------
+
 model Culte {
-  id             Int             @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   dateCulte      DateTime
-  horaire        String           // ex: "08h00", "10h00", "12h00"
+  horaire        String
   themePrincipal String?
-  predications   Predication[]
-  annonces       Annonce[]
+
+  predications Predication[]
+  annonces     Annonce[]
 }
 
-// ✅ PREDICATIONS D'UN CULTE
+// ---------------------------
+// PREDICATION
+// ---------------------------
+
 model Predication {
-  id             Int        @id @default(autoincrement())
-  culteId        Int
-  titre          String
-  texteBiblique  String
-  resume         String?  @db.Text
-  message        String? @db.Text
-  predicateurId  Int
+  id            Int     @id @default(autoincrement())
+  culteId       Int
+  titre         String
+  texteBiblique String
+  resume        String? @db.Text
+  message       String? @db.Text
+  predicateurId Int
 
-  // Relations
-  culte          Culte      @relation(fields: [culteId], references: [id], onDelete: Cascade)
-  predicateur    Membre     @relation("PredicationParMembre", fields: [predicateurId], references: [id])
+  culte       Culte  @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  predicateur Membre @relation("PredicationParMembre", fields: [predicateurId], references: [id])
 }
 
-// ✅ ANNONCES FAITES PENDANT UN CULTE
+// ---------------------------
+// ANNONCE
+// ---------------------------
+
 model Annonce {
-  id                Int               @id @default(autoincrement())
-  culteId           Int
-  titre             String
+  id      Int    @id @default(autoincrement())
+  culteId Int
+  titre   String
 
-  // Sections du contenu
-  compteRendu       CompteRendu?
-   infosJour         String?           @db.Text
-  remerciements     String?           @db.Text
-  rappels           String?           @db.Text
-  commentaires      String?
+  infosJour     String? @db.Text
+  remerciements String? @db.Text
+  rappels       String? @db.Text
+  commentaires  String?
 
-  // Relation
-  culte             Culte             @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  compteRendu CompteRendu?
+
+  culte Culte @relation(fields: [culteId], references: [id], onDelete: Cascade)
 }
 
-// ✅ DÉTAILS DU COMPTE RENDU DU DERNIER CULTE
+// ---------------------------
+// COMPTE RENDU
+// ---------------------------
+
 model CompteRendu {
-  id               Int       @id @default(autoincrement())
-  annonceId        Int       @unique
+  id               Int    @id @default(autoincrement())
+  annonceId        Int    @unique
   messager         String
   texteBiblique    String
   assistanceTotale Int
   theme            String
 
-  annonce          Annonce   @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+  annonce Annonce @relation(fields: [annonceId], references: [id], onDelete: Cascade)
 }
