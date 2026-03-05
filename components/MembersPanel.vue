@@ -1125,7 +1125,7 @@ filteredAndSortedMembres.value.forEach((membre, index) => {
   const contact = membre.contact || 'N/A';
   
   // Formatage des dates
-  const dateEntree = formatShortDate(membre.DateEntreAuDepartementCulte);
+  const dateEntree = formatShortDate(membre.dateEntreeDepartement);
   const situationMatrimoniale = truncateText(membre.situationMatrimoniale,40);
   
   htmlContent += `
