@@ -253,13 +253,13 @@
                 <div>
                   <span class="text-xs text-gray-500">Profession</span>
                   <p class="text-sm font-medium text-gray-900 mt-1">
-                    {{ membre.Profession || 'Non renseignée' }}
+                    {{ membre.profession || 'Non renseignée' }}
                   </p>
                 </div>
                 <div>
                   <span class="text-xs text-gray-500">Activité au sein du département</span>
                   <p class="text-sm font-medium text-gray-900 mt-1">
-                    {{ membre.ActiviteAuSeinDP || 'Non renseignée' }}
+                    {{ membre.activiteAuSeinDP || 'Non renseignée' }}
                   </p>
                 </div>
               </div>
@@ -271,7 +271,7 @@
                 <div>
                   <span class="text-xs text-gray-500">Date d'entrée</span>
                   <p class="text-sm font-medium text-gray-900 mt-1">
-                    {{ membre.DateEntreAuDepartementCulte ? formatDate(membre.DateEntreAuDepartementCulte) : 'Non renseignée' }}
+                    {{ membre.dateEntreeDepartement ? formatDate(membre.dateEntreeDepartement) : 'Non renseignée' }}
                   </p>
                 </div>
                 <div>
@@ -544,11 +544,11 @@
                 <div class="space-y-4">
                   <div>
                     <span class="text-gray-600 block mb-1">Profession</span>
-                    <p class="font-medium text-lg">{{ selectedMembre.Profession || 'Non renseignée' }}</p>
+                    <p class="font-medium text-lg">{{ selectedMembre.profession || 'Non renseignée' }}</p>
                   </div>
                   <div>
                     <span class="text-gray-600 block mb-1">Activité au sein du département</span>
-                    <p class="font-medium">{{ selectedMembre.ActiviteAuSeinDP || 'Non renseignée' }}</p>
+                    <p class="font-medium">{{ selectedMembre.activiteAuSeinDP || 'Non renseignée' }}</p>
                   </div>
                 </div>
               </div>
@@ -655,7 +655,7 @@ const onSaved = () => {
 const professionsList = computed(() => {
   const professions = new Set()
   membres.value.forEach(m => {
-    if (m.Profession) professions.add(m.Profession)
+    if (m.profession) professions.add(m.Profession)
   })
   return Array.from(professions).sort()
 })
@@ -690,8 +690,8 @@ const filteredAndSortedMembres = computed(() => {
       m.prenom?.toLowerCase().includes(term) ||
       m.contact?.toLowerCase().includes(term) ||
       m.email?.toLowerCase().includes(term) ||
-      m.Profession?.toLowerCase().includes(term) ||
-      m.ActiviteAuSeinDP?.toLowerCase().includes(term) ||
+      m.profession?.toLowerCase().includes(term) ||
+      m.activiteAuSeinDP?.toLowerCase().includes(term) ||
       m.adresse?.toLowerCase().includes(term)
     )
   }
@@ -835,8 +835,8 @@ const exportToPDF = async () => {
       membre.sexe,
       membre.contact || 'N/A',
       membre.email || 'N/A',
-      membre.Profession || 'N/A',
-      membre.ActiviteAuSeinDP || 'N/A',
+      membre.profession || 'N/A',
+      membre.activiteAuSeinDP || 'N/A',
       formatDate(membre.dateInscription)
     ])
     
@@ -887,9 +887,9 @@ const exportToExcel = async () => {
       membre.contact,
       membre.email,
       membre.adresse,
-      membre.Profession,
-      membre.ActiviteAuSeinDP,
-      formatDate(membre.DateEntreAuDepartementCulte),
+      membre.profession,
+      membre.activiteAuSeinDP,
+      formatDate(membre.dateEntreeDepartement),
       formatDate(membre.dateInscription)
     ])
     
@@ -1119,14 +1119,14 @@ filteredAndSortedMembres.value.forEach((membre, index) => {
   const nomComplet = `${membre.nom || ''} ${membre.prenom || ''}`.trim();
   const nomTronque = truncateText(nomComplet, 40);
   
-  const profession = truncateText(membre.Profession, 18);
-  const activite = truncateText(membre.ActiviteAuSeinDP, 20);
+  const profession = truncateText(membre.profession, 18);
+  const activite = truncateText(membre.activiteAuSeinDP, 20);
   const adresse = truncateText(membre.adresse, 40);
   const contact = membre.contact || 'N/A';
   
   // Formatage des dates
   const dateEntree = formatShortDate(membre.DateEntreAuDepartementCulte);
-  const SituationMatriMoniale = truncateText(membre.SituationMatriMoniale,40);
+  const situationMatrimoniale = truncateText(membre.situationMatrimoniale,40);
   
   htmlContent += `
       <tr>
@@ -1134,10 +1134,10 @@ filteredAndSortedMembres.value.forEach((membre, index) => {
         <td class="col-sexe">${membre.sexe || 'N/A'}</td>
         <td class="col-contact" title="${contact}">${contact}</td>
         <td class="col-email" title="${membre.adresse || ''}">${adresse}</td>
-        <td class="col-profession" title="${membre.Profession || ''}">${profession}</td>
-        <td class="col-activite" title="${membre.ActiviteAuSeinDP || ''}">${activite}</td>
+        <td class="col-profession" title="${membre.profession || ''}">${profession}</td>
+        <td class="col-activite" title="${membre.activiteAuSeinDP || ''}">${activite}</td>
         <td class="col-entree">${dateEntree}</td>
-        <td class="col-inscription">${SituationMatriMoniale}</td>
+        <td class="col-inscription">${situationMatrimoniale}</td>
       </tr>
   `;
 });

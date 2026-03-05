@@ -140,7 +140,7 @@
           Profession
         </label>
         <input 
-          v-model="form.Profession" 
+          v-model="form.profession" 
           placeholder="Ex: Enseignant, Infirmier..." 
           class="input-field"
         />
@@ -151,7 +151,7 @@
           Activité au sein du département de culte
         </label>
         <input 
-          v-model="form.ActiviteAuSeinDP" 
+          v-model="form.activiteAuSeinDP" 
           placeholder="Ex: Choriste, Trésorier..." 
           class="input-field"
         />
@@ -207,8 +207,8 @@ const form = reactive({
   email: '',
   adresse: '',
   DateEntreAuDepartementCulte: '',
-  Profession: '',
-  ActiviteAuSeinDP: '',
+  profession: '',
+  activiteAuSeinDP: '',
   SituationMatriMoniale:''
 })
 
@@ -222,8 +222,8 @@ const resetForm = () => {
     email: '',
     adresse: '',
     DateEntreAuDepartementCulte: '',
-    Profession: '',
-    ActiviteAuSeinDP: '',
+    profession: '',
+    activiteAuSeinDP: '',
     SituationMatriMoniale:''
   })
 }
