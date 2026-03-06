@@ -50,7 +50,7 @@ model Membre {
   profession    String?
   activiteAuSeinDP String?
   dateInscription DateTime @default(now())
-
+  photo         String?   // URL ou chemin de la photo
   // Relations
   activites            ActiviteMembre[]
   predications         Predication[] @relation("PredicationParMembre")
