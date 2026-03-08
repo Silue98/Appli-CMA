@@ -57,10 +57,10 @@ export default defineEventHandler(async (event) => {
       adresse: body.adresse || null,
 
       // ✅ correction
-      situationMatrimoniale: body.SituationMatriMoniale || null,
+      situationMatrimoniale: body.situationMatrimoniale || null,
 
-      dateEntreeDepartement: body.DateEntreAuDepartementCulte
-        ? new Date(body.DateEntreAuDepartementCulte)
+      dateEntreeDepartement: body.dateEntreeDepartement
+        ? new Date(body.dateEntreeDepartement)
         : null,
 
       profession: body.profession || null,
