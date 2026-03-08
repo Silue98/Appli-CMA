@@ -134,7 +134,12 @@ export default defineEventHandler(async (event) => {
       dateNaissance: body.dateNaissance
         ? new Date(body.dateNaissance)
         : null,
-
+      dateBaptemes: body.dateBaptemes
+        ? new Date(body.dateBaptemes)
+        : null,
+      dateEntreeAleglise: body.dateEntreeAleglise
+        ? new Date(body.dateEntreeAleglise)
+        : null,
       contact: body.contact || null,
       email: body.email || null,
       adresse: body.adresse || null,

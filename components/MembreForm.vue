@@ -310,10 +310,45 @@
 
       <div class="group">
         <label class="block text-sm font-medium text-gray-600 mb-2 group-focus-within:text-green-600 transition-colors">
-          Groupe d'activité <span class="text-red-500">*</span>
+          Date d'intégration de l'église
         </label>
         <div class="relative">
-          <select  v-model="form.activiteAuSeinDP" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-400 focus:border-transparent outline-none appearance-none transition-all duration-200 group-hover:border-gray-300">
+          <input 
+            v-model="form.dateEntreeAleglise" 
+            type="date" 
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-400 focus:border-transparent outline-none transition-all duration-200 group-hover:border-gray-300"
+          />
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+<div class="group">
+        <label class="block text-sm font-medium text-gray-600 mb-2 group-focus-within:text-green-600 transition-colors">
+          Date de Baptêmes
+        </label>
+        <div class="relative">
+          <input 
+            v-model="form.dateBaptemes" 
+            type="date" 
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-400 focus:border-transparent outline-none transition-all duration-200 group-hover:border-gray-300"
+          />
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="group">
+        <label class="block text-sm font-medium text-gray-600 mb-2 group-focus-within:text-green-600 transition-colors">
+         Groupe d'activité <!-- Groupe d'activité <span class="text-red-500">*</span> -->
+        </label>
+        <div class="relative">
+          <select  v-model="form.activiteAuSeinDP"  class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-400 focus:border-transparent outline-none appearance-none transition-all duration-200 group-hover:border-gray-300">
             <option value="" disabled class="text-gray-400">Sélectionnez votre groupe d'activité</option>
             <option value="Département Culte">Département Culte</option>
             <option value="Affermissement">Affermissement</option>
@@ -572,6 +607,8 @@ const form = reactive({
   profession: '',
   activiteAuSeinDP: '',
   situationMatrimoniale: '',
+  dateBaptemes:'',
+  dateEntreeAleglise:'',
   photo: null
 })
 
@@ -636,6 +673,8 @@ const resetForm = () => {
     profession: '',
     activiteAuSeinDP: '',
     situationMatrimoniale: '',
+    dateBaptemes:'',
+    dateEntreeAleglise:'',
     photo: null
   })
   removePhoto()
@@ -654,7 +693,7 @@ const fileToBase64 = (file) => {
 const save = async () => {
   try {
     // Validation des champs obligatoires
-    if (!form.nom || !form.prenom || !form.sexe || !form.situationMatrimoniale || !form.activiteAuSeinDP) {
+    if (!form.nom || !form.prenom || !form.sexe || !form.situationMatrimoniale) {
       alert('Veuillez remplir tous les champs obligatoires (*)')
       return
     }
@@ -671,7 +710,9 @@ const save = async () => {
       situationMatrimoniale: form.situationMatrimoniale,
       dateEntreeDepartement: form.dateEntreeDepartement || null,
       profession: form.profession || null,
-      activiteAuSeinDP: form.activiteAuSeinDP
+      activiteAuSeinDP: form.activiteAuSeinDP,
+      dateBaptemes: form.dateBaptemes|| null,
+      dateEntreeAleglise: form.dateEntreeAleglise|| null
     }
 
     // Si une photo est sélectionnée, la convertir en Base64 et l'ajouter

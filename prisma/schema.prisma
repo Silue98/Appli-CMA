@@ -51,6 +51,9 @@ model Membre {
   activiteAuSeinDP String?
   dateInscription DateTime @default(now())
   photo         String?   // URL ou chemin de la photo
+  //
+  dateEntreeAleglise  DateTime?
+  dateBaptemes  DateTime?
   // Relations
   activites            ActiviteMembre[]
   predications         Predication[] @relation("PredicationParMembre")
