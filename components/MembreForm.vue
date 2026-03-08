@@ -377,7 +377,7 @@
   </form>
 </template>
 
-<script setup>
+<!-- <script setup>
 import { reactive, ref } from 'vue'
 
 const emit = defineEmits(['saved'])
@@ -474,12 +474,12 @@ const resetForm = () => {
 const save = async () => {
   try {
     // Validation simple
-    if (!form.nom || !form.prenom || !form.sexe) {
+    if (!form.nom || !form.prenom || !form.sexe || !form.situationMatrimoniale || !form.activiteAuSeinDP) {
       alert('Veuillez remplir les champs obligatoires (*)')
       return
     }
 
-    // Créer un objet avec les données (sans FormData pour éviter les problèmes)
+    // Créer l'objet memberData avec les BONS NOMS (casse sensible)
     const memberData = {
       nom: form.nom,
       prenom: form.prenom,
@@ -495,6 +495,21 @@ const save = async () => {
       photo: null // Pour l'instant, on met null pour la photo
     }
 
+    // Gestion de la photo - À implémenter selon votre backend
+    // Option 1: Si vous devez envoyer la photo en même temps, utilisez FormData
+    // Option 2: Si la photo est optionnelle, envoyez d'abord les données puis la photo
+    if (photoFile.value) {
+      // Ici, soit vous utilisez FormData pour tout envoyer ensemble
+      // Soit vous uploadez la photo séparément après la création du membre
+      console.log('Photo à uploader:', photoFile.value.name)
+      
+      // Exemple d'upload séparé (à adapter selon votre API)
+      // const photoFormData = new FormData()
+      // photoFormData.append('photo', photoFile.value)
+      // photoFormData.append('membreId', response.id) // Après création du membre
+      // await $fetch('/api/upload', { method: 'POST', body: photoFormData })
+    }
+
     console.log('Données envoyées:', memberData)
 
     const response = await $fetch('/api/membres', { 
@@ -506,6 +521,21 @@ const save = async () => {
     })
     
     console.log('Réponse:', response)
+    
+    // Si la photo doit être envoyée après la création du membre
+    if (photoFile.value && response.id) {
+      // Upload de la photo avec l'ID du membre
+      const photoFormData = new FormData()
+      photoFormData.append('photo', photoFile.value)
+      photoFormData.append('membreId', response.id)
+      
+      await $fetch('/api/membres/photo', { 
+        method: 'POST',
+        body: photoFormData
+      })
+      console.log('Photo uploadée avec succès')
+    }
+    
     resetForm()
     emit('saved')
     
@@ -514,6 +544,174 @@ const save = async () => {
   } catch (error) {
     console.error('Erreur lors de l\'enregistrement:', error)
     alert('Une erreur est survenue lors de l\'enregistrement: ' + (error.data?.message || error.message))
+  }
+}
+</script> -->
+<script setup>
+import { reactive, ref } from 'vue'
+
+const emit = defineEmits(['saved'])
+
+// Références pour les inputs de fichier
+const fileInput = ref(null)
+const cameraInput = ref(null)
+
+// États pour la photo
+const photoFile = ref(null)
+const photoPreview = ref(null)
+
+const form = reactive({
+  nom: '',
+  prenom: '',
+  sexe: '',
+  dateNaissance: '',
+  contact: '',
+  email: '',
+  adresse: '',
+  dateEntreeDepartement: '',
+  profession: '',
+  activiteAuSeinDP: '',
+  situationMatrimoniale: '',
+  photo: null
+})
+
+// Fonction pour prendre une photo avec l'appareil photo
+const takePhoto = () => {
+  cameraInput.value.click()
+}
+
+// Fonction pour choisir une photo depuis la galerie
+const chooseFromGallery = () => {
+  fileInput.value.click()
+}
+
+// Fonction pour supprimer la photo
+const removePhoto = () => {
+  photoFile.value = null
+  photoPreview.value = null
+  form.photo = null
+  // Réinitialiser les inputs de fichier
+  if (fileInput.value) fileInput.value.value = ''
+  if (cameraInput.value) cameraInput.value.value = ''
+}
+
+// Gestionnaire de sélection de fichier
+const handleFileSelect = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    // Vérifier la taille du fichier (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La photo ne doit pas dépasser 5MB')
+      return
+    }
+    
+    // Vérifier le type de fichier
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner une image valide')
+      return
+    }
+    
+    photoFile.value = file
+    form.photo = file
+    
+    // Créer un aperçu
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      photoPreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const resetForm = () => {
+  Object.assign(form, {
+    nom: '',
+    prenom: '',
+    sexe: '',
+    dateNaissance: '',
+    contact: '',
+    email: '',
+    adresse: '',
+    dateEntreeDepartement: '',
+    profession: '',
+    activiteAuSeinDP: '',
+    situationMatrimoniale: '',
+    photo: null
+  })
+  removePhoto()
+}
+
+// Convertir une image en Base64
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = (error) => reject(error)
+  })
+}
+
+const save = async () => {
+  try {
+    // Validation des champs obligatoires
+    if (!form.nom || !form.prenom || !form.sexe || !form.situationMatrimoniale || !form.activiteAuSeinDP) {
+      alert('Veuillez remplir tous les champs obligatoires (*)')
+      return
+    }
+
+    // Créer l'objet memberData avec les BONS NOMS (casse sensible)
+    const memberData = {
+      nom: form.nom,
+      prenom: form.prenom,
+      sexe: form.sexe, // L'API mettra en majuscule avec toUpperCase()
+      dateNaissance: form.dateNaissance || null,
+      contact: form.contact || null,
+      email: form.email || null,
+      adresse: form.adresse || null,
+      situationMatrimoniale: form.situationMatrimoniale,
+      dateEntreeDepartement: form.dateEntreeDepartement || null,
+      profession: form.profession || null,
+      activiteAuSeinDP: form.activiteAuSeinDP
+    }
+
+    // Si une photo est sélectionnée, la convertir en Base64 et l'ajouter
+    if (photoFile.value) {
+      const base64Photo = await fileToBase64(photoFile.value)
+      memberData.photo = base64Photo
+      console.log('Photo convertie en Base64')
+    }
+
+    console.log('Données envoyées:', memberData)
+
+    // Envoyer les données en JSON
+    const response = await $fetch('/api/membres', { 
+      method: 'POST',
+      body: memberData,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    console.log('Membre créé avec succès:', response)
+    
+    // Réinitialiser le formulaire
+    resetForm()
+    emit('saved')
+    
+    alert('Membre enregistré avec succès!')
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement:', error)
+    
+    // Gestion d'erreur plus détaillée
+    let errorMessage = 'Une erreur est survenue lors de l\'enregistrement'
+    if (error.data?.message) {
+      errorMessage += ': ' + error.data.message
+    } else if (error.message) {
+      errorMessage += ': ' + error.message
+    }
+    
+    alert(errorMessage)
   }
 }
 </script>
