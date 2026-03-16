@@ -1,287 +1,71 @@
 <template>
-  <!-- Menu hamburger pour mobile -->
+  <!-- Mobile top bar -->
   <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-green-700 to-blue-700 text-white p-4">
     <div class="flex items-center justify-between">
-      <button
-        @click="isMobileMenuOpen = !isMobileMenuOpen"
-        class="p-2 rounded-lg hover:bg-green-600 transition"
-      >
+      <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="p-2 rounded-lg hover:bg-green-600 transition">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path 
-            v-if="!isMobileMenuOpen" 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
-            d="M4 6h16M4 12h16M4 18h16" 
-          />
-          <path 
-            v-else 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
-            d="M6 18L18 6M6 6l12 12" 
-          />
+          <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
-      
-      <div class="text-xl font-bold flex items-center gap-2">
-        ⛪ CMA DOKUI1
-      </div>
-      
-      <div class="w-10"> <!-- Espaceur pour centrer le titre --> </div>
+      <span class="font-bold">⛪ CMA DOKUI1</span>
+      <div class="w-10"></div>
     </div>
-    
-    <!-- Menu mobile overlay -->
-    <div 
-      v-if="isMobileMenuOpen" 
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 mt-16"
-      @click="isMobileMenuOpen = false"
-    ></div>
-    
-    <!-- Menu mobile -->
-    <div 
-      v-if="isMobileMenuOpen"
-      class="fixed top-16 left-0 right-0 bottom-0 bg-gradient-to-b from-green-800 to-blue-800 text-white z-50 overflow-y-auto"
-    >
+    <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black/50 z-40 mt-16" @click="isMobileMenuOpen = false"></div>
+    <div v-if="isMobileMenuOpen" class="fixed top-16 left-0 right-0 bottom-0 bg-gradient-to-b from-green-800 to-blue-900 z-50 overflow-y-auto">
       <nav class="p-4">
-        <ul class="space-y-2">
-          <li>
-            <button
-              @click="navigateAndClose('dashboard')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              📊 Tableau de bord
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('membres')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0c-.966.028-1.932.09-2.895.185" />
-              </svg>
-              👥 Membres
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('cultes')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              ⛪ Cultes
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('predications')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              📖 Prédications
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('annonces')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-              </svg>
-              📢 Annonces
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('activites')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              🎯 Activités
-            </button>
-          </li>
-          
- <li>
-            <button
-              @click="navigateAndClose('annonces')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-              </svg>
-              📢 Annonces
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('activites')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              🎯 Activités
-            </button>
-          </li>
-
-          <li>
-            <button
-              @click="navigateAndClose('finances')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              💰 Finances
-            </button>
-          </li>
-          <li>
-            <button
-              @click="navigateAndClose('messages')"
-              class="block w-full text-left p-3 rounded-lg hover:bg-green-600 transition flex items-center gap-3"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              💬 Messages
-            </button>
-          </li>
-        </ul>
-        
-        <!-- Bouton de déconnexion en bas sur mobile -->
-        <div class="mt-8 pt-4 border-t border-green-600">
-          <button
-            @click="$emit('logout')"
-            class="block w-full text-left p-3 rounded-lg hover:bg-red-600 transition flex items-center gap-3 text-red-200 hover:text-white"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Déconnexion
+        <div v-for="group in menuGroups" :key="group.label" class="mb-4">
+          <p class="text-xs font-semibold text-green-300 uppercase tracking-wider px-2 mb-1">{{ group.label }}</p>
+          <ul class="space-y-0.5">
+            <li v-for="item in group.items.filter(i => peutVoir(i.roles))" :key="item.section">
+              <button @click="navigateAndClose(item.section)"
+                :class="['w-full text-left p-2.5 rounded-lg transition flex items-center gap-3 text-sm', activeSection === item.section ? 'bg-white/25 font-semibold' : 'hover:bg-white/10']">
+                <span class="w-5 text-center">{{ item.icon }}</span>{{ item.label }}
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="mt-4 pt-4 border-t border-green-600">
+          <div v-if="user" class="px-2 py-2 mb-2 text-sm text-green-200">{{ user.prenom }} {{ user.nom }} — {{ user.role }}</div>
+          <button @click="handleLogout" class="w-full text-left p-2.5 rounded-lg hover:bg-red-600 transition flex items-center gap-3 text-red-200 hover:text-white text-sm">
+            🚪 Déconnexion
           </button>
         </div>
       </nav>
     </div>
   </div>
 
-  <!-- Sidebar pour desktop -->
-  <aside class="hidden lg:flex w-64 bg-gradient-to-b from-green-700 to-blue-700 text-white flex-col h-screen sticky top-0">
-    <div class="p-4 text-2xl font-bold text-white flex items-center gap-2">
-      ⛪ CMA DOKUI1
+  <!-- Desktop sidebar -->
+  <aside class="hidden lg:flex w-60 bg-gradient-to-b from-green-700 to-blue-800 text-white flex-col h-screen sticky top-0 overflow-hidden">
+    <div class="p-4 border-b border-green-600/50">
+      <p class="text-lg font-bold">⛪ CMA DOKUI1</p>
+      <p class="text-xs text-green-200 mt-0.5">Gestion complète</p>
     </div>
 
-    <nav class="flex-1">
-      <ul class="space-y-1 p-2">
-        <li>
-          <button
-            @click="$emit('navigate', 'dashboard')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            📊 Tableau de bord
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'membres')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 0c-.966.028-1.932.09-2.895.185" />
-            </svg>
-            👥 Membres
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'cultes')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            ⛪ Cultes
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'predications')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            📖 Prédications
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'annonces')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-            </svg>
-            📢 Annonces
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'activites')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            🎯 Activités
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'finances')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            💰 Finances
-          </button>
-        </li>
-        <li>
-          <button
-            @click="$emit('navigate', 'messages')"
-            class="block w-full text-left p-2 rounded hover:bg-green-600 transition flex items-center gap-3"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            💬 Messages
-          </button>
-        </li>
-      </ul>
+    <nav class="flex-1 overflow-y-auto py-2">
+      <div v-for="group in menuGroups" :key="group.label" class="mb-3">
+        <p class="text-xs font-semibold text-green-300 uppercase tracking-wider px-3 mb-1">{{ group.label }}</p>
+        <ul class="space-y-0.5 px-2">
+          <li v-for="item in group.items.filter(i => peutVoir(i.roles))" :key="item.section">
+            <button @click="$emit('navigate', item.section)"
+              :class="['w-full text-left px-3 py-2 rounded-lg transition flex items-center gap-2.5 text-sm', activeSection === item.section ? 'bg-white/25 font-semibold' : 'hover:bg-white/10']">
+              <span class="w-4 text-center text-base flex-shrink-0">{{ item.icon }}</span>
+              <span class="truncate">{{ item.label }}</span>
+            </button>
+          </li>
+        </ul>
+      </div>
     </nav>
-    
-    <!-- Bouton de déconnexion en bas sur desktop -->
-    <div class="p-4 border-t border-green-600">
-      <button
-        @click="$emit('logout')"
-        class="block w-full text-left p-2 rounded hover:bg-red-600 transition flex items-center gap-3 text-red-200 hover:text-white"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+
+    <div class="p-3 border-t border-green-600/50">
+      <div v-if="user" class="mb-2 px-2 py-2 rounded-lg bg-white/10">
+        <p class="text-xs text-green-200">Connecté</p>
+        <p class="text-sm font-semibold truncate">{{ user.prenom }} {{ user.nom }}</p>
+        <p class="text-xs text-green-300">{{ roleLabel(user.role) }}</p>
+      </div>
+      <button @click="handleLogout" class="w-full text-left px-3 py-2 rounded-lg hover:bg-red-600/80 transition flex items-center gap-2 text-red-200 hover:text-white text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
         </svg>
         Déconnexion
       </button>
@@ -290,32 +74,96 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
+const props = defineProps({
+  activeSection: { type: String, default: 'dashboard' },
+  user: { type: Object, default: null }
+})
+const emit = defineEmits(['navigate', 'logout'])
 const isMobileMenuOpen = ref(false)
 
-const navigateAndClose = (page) => {
-  emit('navigate', page)
+const menuGroups = [
+  {
+    label: 'Principal',
+    items: [
+      { section: 'dashboard',     icon: '📊', label: 'Tableau de bord',   roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','TRESORIER','LECTEUR'] },
+    ]
+  },
+  {
+    label: 'Membres & Église',
+    items: [
+      { section: 'membres',       icon: '👥', label: 'Membres',           roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+      { section: 'departements',  icon: '🏛️', label: 'Départements',     roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+      { section: 'actes',         icon: '✝️', label: 'Actes pastoraux',  roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+    ]
+  },
+  {
+    label: 'Culte',
+    items: [
+      { section: 'cultes',        icon: '⛪', label: 'Cultes',            roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+      { section: 'predications',  icon: '📖', label: 'Prédications',     roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+      { section: 'programmes',    icon: '📅', label: 'Programmes',       roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+      { section: 'impression',    icon: '🖨️', label: 'Impression',      roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+      { section: 'annonces',      icon: '📢', label: 'Annonces',         roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+      { section: 'presences',     icon: '✅', label: 'Présences',        roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+    ]
+  },
+  {
+    label: 'Événements',
+    items: [
+      { section: 'evenements',    icon: '🎉', label: 'Événements',       roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+    ]
+  },
+  {
+    label: 'Finances',
+    items: [
+      { section: 'finances',      icon: '💰', label: 'Finances',         roles: ['SUPER_ADMIN','ADMIN','PASTEUR','TRESORIER'] },
+      { section: 'dimes',         icon: '💎', label: 'Dîmes',           roles: ['SUPER_ADMIN','ADMIN','PASTEUR','TRESORIER'] },
+      { section: 'budgets',       icon: '📊', label: 'Budgets',         roles: ['SUPER_ADMIN','ADMIN','PASTEUR','TRESORIER'] },
+    ]
+  },
+  {
+    label: 'Pastorale',
+    items: [
+      { section: 'cellules',      icon: '🏘️', label: 'Cellules/Zones', roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+      { section: 'pastoral',      icon: '🙏', label: 'Suivi pastoral', roles: ['SUPER_ADMIN','ADMIN','PASTEUR'] },
+    ]
+  },
+  {
+    label: 'Ressources',
+    items: [
+      { section: 'inventaire',    icon: '📦', label: 'Inventaire',     roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+      { section: 'benevoles',     icon: '🙋', label: 'Bénévoles',     roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE'] },
+    ]
+  },
+  {
+    label: 'Administration',
+    items: [
+      { section: 'activites',     icon: '🎯', label: 'Activités',       roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
+      { section: 'utilisateurs',  icon: '👤', label: 'Utilisateurs',    roles: ['SUPER_ADMIN','ADMIN'] },
+    ]
+  }
+]
+
+const peutVoir = (roles) => {
+  const role = props.user?.role || 'LECTEUR'
+  return roles.includes(role)
+}
+
+const roleLabel = (r) => ({
+  SUPER_ADMIN: 'Super Admin', ADMIN: 'Admin', PASTEUR: 'Pasteur',
+  SECRETAIRE: 'Secrétaire', TRESORIER: 'Trésorier', LECTEUR: 'Lecteur'
+}[r] || r)
+
+const navigateAndClose = (section) => {
+  emit('navigate', section)
   isMobileMenuOpen.value = false
 }
 
-const emit = defineEmits(['navigate', 'logout'])
+const handleLogout = async () => {
+  try { await $fetch('/api/auth/logout', { method: 'POST' }) } catch {}
+  emit('logout')
+  await navigateTo('/login')
+}
 </script>
-
-<style scoped>
-/* Animation pour le menu mobile */
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateX(-100%);
-}
-
-/* Empêcher le scroll du body quand le menu est ouvert */
-body.menu-open {
-  overflow: hidden;
-}
-</style>

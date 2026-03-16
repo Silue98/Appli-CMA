@@ -1,6 +1,3 @@
-// ---------------------------
-// DATABASE CONFIGURATION
-// ---------------------------
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -10,13 +7,23 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// ---------------------------
-// ENUMS (BONNES PRATIQUES)
-// ---------------------------
-
 enum Sexe {
   HOMME
   FEMME
+}
+
+enum StatutMembre {
+  ACTIF
+  INACTIF
+  VISITEUR
+  CATECHUMENE
+  TRANSFERE
+}
+
+enum TypeCulte {
+  PREMIER
+  DEUXIEME
+  TROISIEME
 }
 
 enum StatusProgramme {
@@ -26,125 +33,193 @@ enum StatusProgramme {
   ANNULE
 }
 
-enum TypeCulte {
-  PREMIER
-  DEUXIEME
-  TROISIEME
+enum TypeTransaction {
+  OFFRANDE
+  DIXME
+  DON
+  DEPENSE
+  REMBOURSEMENT
+  AUTRE
 }
 
-// ---------------------------
-// MEMBRE
-// ---------------------------
+enum TypePresence {
+  PRESENT
+  ABSENT
+  EXCUSE
+}
+
+enum TypeEvenement {
+  RETRAITE
+  CONFERENCE
+  CAMP
+  EVANGELISATION
+  MARIAGE
+  BAPTEME
+  FUNERAILLES
+  DEDICACE
+  ANNIVERSAIRE
+  AUTRE
+}
+
+enum StatutEvenement {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum TypeActe {
+  MARIAGE
+  BAPTEME_EAU
+  BAPTEME_ESPRIT
+  FUNERAILLES
+  DEDICACE_ENFANT
+  RECEPTION_MEMBRE
+}
+
+enum RoleUtilisateur {
+  SUPER_ADMIN
+  ADMIN
+  PASTEUR
+  SECRETAIRE
+  TRESORIER
+  LECTEUR
+}
+
+model Utilisateur {
+  id         Int              @id @default(autoincrement())
+  nom        String
+  prenom     String
+  email      String           @unique
+  motDePasse String
+  role       RoleUtilisateur  @default(SECRETAIRE)
+  actif      Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model Famille {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  adresse   String?
+  contact   String?
+  createdAt DateTime @default(now())
+  membres   Membre[]
+}
+
+model Departement {
+  id          Int      @id @default(autoincrement())
+  nom         String
+  description String?  @db.Text
+  couleur     String?
+  icone       String?
+  actif       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  membres     MembreDepartement[]
+  finances    Finance[]
+  evenements  Evenement[]
+}
+
+model MembreDepartement {
+  id            Int         @id @default(autoincrement())
+  membreId      Int
+  departementId Int
+  role          String?
+  dateDebut     DateTime    @default(now())
+  dateFin       DateTime?
+  actif         Boolean     @default(true)
+  membre        Membre      @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  departement   Departement @relation(fields: [departementId], references: [id], onDelete: Cascade)
+  @@unique([membreId, departementId])
+}
 
 model Membre {
-  id            Int       @id @default(autoincrement())
-  nom           String
-  prenom        String
-  sexe          Sexe
-  dateNaissance DateTime?
-  contact       String?
-  email         String?   @unique
-  adresse       String?
+  id                    Int           @id @default(autoincrement())
+  numeroMembre          String?       @unique
+  nom                   String
+  prenom                String
+  sexe                  Sexe
+  dateNaissance         DateTime?
+  contact               String?
+  email                 String?       @unique
+  adresse               String?
   situationMatrimoniale String?
-  dateEntreeDepartement  DateTime?
-  profession    String?
-  activiteAuSeinDP String?
-  dateInscription DateTime @default(now())
-  photo         String?   // URL ou chemin de la photo
-  //
-  dateEntreeAleglise  DateTime?
-  dateBaptemes  DateTime?
-  // Relations
-  activites            ActiviteMembre[]
-  predications         Predication[] @relation("PredicationParMembre")
-  programmesPlanifies  ProgrammeCulte[] @relation("PlanificateurProgramme")
-  rolesAttribues       RoleProgramme[]
+  profession            String?
+  photo                 String?
+  statut                StatutMembre  @default(ACTIF)
+  dateEntreeEglise      DateTime?
+  dateBaptemeEau        DateTime?
+  dateBaptemeEsprit     DateTime?
+  dateEntreeDepartement DateTime?
+  activiteAuSeinDP      String?
+  numeroCarteMembre     String?
+  familleId             Int?
+  famille               Famille?      @relation(fields: [familleId], references: [id])
+  dateInscription       DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  departements          MembreDepartement[]
+  predications          Predication[] @relation("PredicationParMembre")
+  programmesPlanifies   ProgrammeCulte[] @relation("PlanificateurProgramme")
+  rolesAttribues        RoleProgramme[]
+  presences             Presence[]
+  dimes                 Dime[]
+  activites             ActiviteMembre[]
+  actesComme            ActePastoral[] @relation("ActeConcerne")
+  actesCommeTémoin      ActePastoral[] @relation("ActeTémoin")
+  cellules              MembreCellule[]
+  visitesPastorales     VisitePastorale[]
+  nouveauConverti       NouveauConverti?
+  demandesPriere        DemandePriere[]
+  servicesBenevoles     ServiceBenevole[]
+  cellulesResponsable   Cellule[] @relation("CelluleResponsable")
 }
 
-// ---------------------------
-// PROGRAMME DE CULTE
-// ---------------------------
+model Culte {
+  id             Int           @id @default(autoincrement())
+  dateCulte      DateTime
+  horaire        String
+  themePrincipal String?
+  assistance     Int?
+  notes          String?       @db.Text
+  createdAt      DateTime      @default(now())
+  predications   Predication[]
+  annonces       Annonce[]
+  presences      Presence[]
+  finances       Finance[]
+}
 
 model ProgrammeCulte {
-  id              Int       @id @default(autoincrement())
-  date            DateTime  @unique
-  semaine         String?
-  typeCulte       String?
-  theme           String?
-
+  id                  Int             @id @default(autoincrement())
+  date                DateTime
+  semaine             String?
+  typeCulte           String?
+  theme               String?
   cantiqueFrancais    String?
   cantiqueBaoule      String?
   cantiqueFrancaisRef String?
   cantiqueBaouleRef   String?
-
-  notes           String? @db.Text
-  status          StatusProgramme @default(PLANIFIE)
-
-  // Responsable (relation nommée)
-  planificateur   Membre? @relation("PlanificateurProgramme", fields: [planificateurId], references: [id])
-  planificateurId Int?
-
-  // Relations
-  roles       RoleProgramme[]
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  notes               String?         @db.Text
+  status              StatusProgramme @default(PLANIFIE)
+  planificateurId     Int?
+  planificateur       Membre?         @relation("PlanificateurProgramme", fields: [planificateurId], references: [id], onDelete: SetNull)
+  roles               RoleProgramme[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
 
-// ---------------------------
-// ROLES DANS UN PROGRAMME
-// ---------------------------
-
 model RoleProgramme {
-  id          Int       @id @default(autoincrement())
-
+  id          Int            @id @default(autoincrement())
   programmeId Int
   programme   ProgrammeCulte @relation(fields: [programmeId], references: [id], onDelete: Cascade)
-
   culteType   TypeCulte
   role        String
   heure       String?
-
   membreId    Int?
-  membre      Membre? @relation(fields: [membreId], references: [id])
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  membre      Membre?        @relation(fields: [membreId], references: [id], onDelete: SetNull)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   @@unique([programmeId, culteType, role])
 }
-
-// ---------------------------
-// ACTIVITÉS D’UN MEMBRE
-// ---------------------------
-
-model ActiviteMembre {
-  id           Int      @id @default(autoincrement())
-  membreId     Int
-  titre        String
-  description  String?
-  dateActivite DateTime
-
-  membre       Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
-}
-
-// ---------------------------
-// CULTE (08H / 10H / 12H)
-// ---------------------------
-
-model Culte {
-  id             Int      @id @default(autoincrement())
-  dateCulte      DateTime
-  horaire        String
-  themePrincipal String?
-
-  predications   Predication[]
-  annonces       Annonce[]
-}
-
-// ---------------------------
-// PREDICATION
-// ---------------------------
 
 model Predication {
   id            Int      @id @default(autoincrement())
@@ -154,41 +229,264 @@ model Predication {
   resume        String?  @db.Text
   message       String?  @db.Text
   predicateurId Int
-
-  culte       Culte  @relation(fields: [culteId], references: [id], onDelete: Cascade)
-  predicateur Membre @relation("PredicationParMembre", fields: [predicateurId], references: [id])
+  createdAt     DateTime @default(now())
+  culte         Culte    @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  predicateur   Membre   @relation("PredicationParMembre", fields: [predicateurId], references: [id], onDelete: Restrict)
 }
-
-// ---------------------------
-// ANNONCE
-// ---------------------------
 
 model Annonce {
-  id            Int      @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   culteId       Int
   titre         String
-
-  infosJour     String? @db.Text
-  remerciements String? @db.Text
-  rappels       String? @db.Text
+  infosJour     String?      @db.Text
+  remerciements String?      @db.Text
+  rappels       String?      @db.Text
   commentaires  String?
-
   compteRendu   CompteRendu?
-
-  culte         Culte   @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  culte         Culte        @relation(fields: [culteId], references: [id], onDelete: Cascade)
 }
 
-// ---------------------------
-// COMPTE RENDU
-// ---------------------------
-
 model CompteRendu {
-  id               Int      @id @default(autoincrement())
-  annonceId        Int      @unique
+  id               Int     @id @default(autoincrement())
+  annonceId        Int     @unique
   messager         String
   texteBiblique    String
   assistanceTotale Int
   theme            String
+  annonce          Annonce @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+}
 
-  annonce          Annonce  @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+model Presence {
+  id        Int          @id @default(autoincrement())
+  culteId   Int
+  membreId  Int
+  statut    TypePresence @default(PRESENT)
+  motif     String?
+  createdAt DateTime     @default(now())
+  culte     Culte        @relation(fields: [culteId], references: [id], onDelete: Cascade)
+  membre    Membre       @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  @@unique([culteId, membreId])
+}
+
+model Evenement {
+  id            Int             @id @default(autoincrement())
+  titre         String
+  description   String?         @db.Text
+  type          TypeEvenement   @default(AUTRE)
+  statut        StatutEvenement @default(PLANIFIE)
+  dateDebut     DateTime
+  dateFin       DateTime?
+  lieu          String?
+  capaciteMax   Int?
+  departementId Int?
+  responsable   String?
+  budget        Float?
+  notes         String?         @db.Text
+  departement   Departement?    @relation(fields: [departementId], references: [id], onDelete: SetNull)
+  inscriptions  Inscription[]
+  finances      Finance[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Inscription {
+  id          Int       @id @default(autoincrement())
+  evenementId Int
+  nom         String
+  prenom      String
+  contact     String?
+  statut      String    @default("CONFIRME")
+  notes       String?
+  evenement   Evenement @relation(fields: [evenementId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+}
+
+model Finance {
+  id            Int             @id @default(autoincrement())
+  type          TypeTransaction
+  montant       Float
+  description   String?
+  date          DateTime        @default(now())
+  reference     String?
+  recu          Boolean         @default(false)
+  culteId       Int?
+  departementId Int?
+  evenementId   Int?
+  culte         Culte?          @relation(fields: [culteId], references: [id], onDelete: SetNull)
+  departement   Departement?    @relation(fields: [departementId], references: [id], onDelete: SetNull)
+  evenement     Evenement?      @relation(fields: [evenementId], references: [id], onDelete: SetNull)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Dime {
+  id        Int       @id @default(autoincrement())
+  membreId  Int
+  montant   Float
+  mois      Int
+  annee     Int
+  paye      Boolean   @default(false)
+  datePaie  DateTime?
+  notes     String?
+  membre    Membre    @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  @@unique([membreId, mois, annee])
+}
+
+model Budget {
+  id            Int      @id @default(autoincrement())
+  annee         Int
+  departementId Int?
+  categorie     String
+  montantPrevu  Float
+  description   String?
+  createdAt     DateTime @default(now())
+}
+
+model ActePastoral {
+  id             Int      @id @default(autoincrement())
+  type           TypeActe
+  date           DateTime
+  lieu           String?
+  officiant      String
+  description    String?  @db.Text
+  notes          String?  @db.Text
+  membreId       Int?
+  membre         Membre?  @relation("ActeConcerne", fields: [membreId], references: [id], onDelete: SetNull)
+  temoinId       Int?
+  temoin         Membre?  @relation("ActeTémoin", fields: [temoinId], references: [id], onDelete: SetNull)
+  conjointNom    String?
+  conjointPrenom String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ActiviteMembre {
+  id           Int      @id @default(autoincrement())
+  membreId     Int
+  titre        String
+  description  String?  @db.Text
+  dateActivite DateTime
+  lieu         String?
+  createdAt    DateTime @default(now())
+  membre       Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════
+// CELLULES / ZONES
+// ═══════════════════════════════════════════
+
+model Cellule {
+  id            Int      @id @default(autoincrement())
+  nom           String
+  zone          String?
+  quartier      String?
+  responsableId Int?
+  responsable   Membre?  @relation("CelluleResponsable", fields: [responsableId], references: [id], onDelete: SetNull)
+  actif         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  membres       MembreCellule[]
+  reunions      ReunionCellule[]
+}
+
+model MembreCellule {
+  id        Int      @id @default(autoincrement())
+  membreId  Int
+  celluleId Int
+  actif     Boolean  @default(true)
+  dateDebut DateTime @default(now())
+  membre    Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  cellule   Cellule  @relation(fields: [celluleId], references: [id], onDelete: Cascade)
+  @@unique([membreId, celluleId])
+}
+
+model ReunionCellule {
+  id        Int      @id @default(autoincrement())
+  celluleId Int
+  date      DateTime
+  lieu      String?
+  theme     String?
+  presents  Int?
+  notes     String?  @db.Text
+  cellule   Cellule  @relation(fields: [celluleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ═══════════════════════════════════════════
+// SUIVI PASTORAL
+// ═══════════════════════════════════════════
+
+model VisitePastorale {
+  id           Int      @id @default(autoincrement())
+  membreId     Int
+  pasteur      String
+  date         DateTime
+  type         String   @default("VISITE")
+  motif        String?
+  notes        String?  @db.Text
+  suivi        String?  @db.Text
+  confidentiel Boolean  @default(false)
+  membre       Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}
+
+model NouveauConverti {
+  id             Int      @id @default(autoincrement())
+  membreId       Int      @unique
+  dateConversion DateTime
+  lieuConversion String?
+  evangelisateur String?
+  stadeFormation String   @default("NOUVEAU")
+  notes          String?  @db.Text
+  membre         Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model DemandePriere {
+  id           Int      @id @default(autoincrement())
+  membreId     Int?
+  nom          String?
+  sujet        String
+  details      String?  @db.Text
+  statut       String   @default("EN_COURS")
+  confidentiel Boolean  @default(false)
+  membre       Membre?  @relation(fields: [membreId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════
+// INVENTAIRE
+// ═══════════════════════════════════════════
+
+model Inventaire {
+  id           Int       @id @default(autoincrement())
+  nom          String
+  categorie    String
+  quantite     Int       @default(1)
+  etat         String    @default("BON")
+  valeur       Float?
+  dateAchat    DateTime?
+  fournisseur  String?
+  numeroSerie  String?
+  localisation String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ═══════════════════════════════════════════
+// BÉNÉVOLES & PLANNING
+// ═══════════════════════════════════════════
+
+model ServiceBenevole {
+  id        Int      @id @default(autoincrement())
+  membreId  Int
+  service   String
+  dimanche  DateTime
+  statut    String   @default("PLANIFIE")
+  notes     String?
+  membre    Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
