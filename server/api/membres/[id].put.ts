@@ -1,8 +1,10 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 import { writeFileSync, mkdirSync, existsSync, unlinkSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.GESTIONNAIRE)
   const id = Number(event.context.params?.id)
   if (isNaN(id)) throw createError({ statusCode: 400, message: 'ID invalide' })
 

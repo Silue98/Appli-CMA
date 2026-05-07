@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
     where: {
       statut: 'ACTIF',
       email: { not: null },
+      recevoirEmails: true,
       dimes: {
         none: { mois, annee, paye: true }
       }

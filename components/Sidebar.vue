@@ -144,6 +144,7 @@ const menuGroups = [
       { section: 'utilisateurs',  icon: '👤', label: 'Utilisateurs',    roles: ['SUPER_ADMIN','ADMIN'] },
       { section: 'inscriptions',  icon: '📝', label: 'Inscriptions',    roles: ['SUPER_ADMIN','ADMIN','SECRETAIRE'] },
       { section: 'emails',         icon: '📧', label: 'Emails',            roles: ['SUPER_ADMIN','ADMIN','PASTEUR'] },
+      { section: 'settings',        icon: '⚙️', label: 'Paramètres',         roles: ['SUPER_ADMIN','ADMIN'] },
     ]
   }
 ]

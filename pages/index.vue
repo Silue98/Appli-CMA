@@ -115,6 +115,7 @@
           <div v-else-if="activeSection === 'benevoles'"    key="benevoles">    <BenevolesPanel/></div>
           <div v-else-if="activeSection === 'inscriptions'" key="inscriptions"> <InscriptionPanel/></div>
           <div v-else-if="activeSection === 'emails'"        key="emails">        <EmailPanel/></div>
+          <div v-else-if="activeSection === 'settings'"      key="settings">      <SettingsPanel/></div>
         </transition>
       </main>
     </div>

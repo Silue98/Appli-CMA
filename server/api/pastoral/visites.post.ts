@@ -1,5 +1,7 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.PASTORAL)
   const body = await readBody(event)
   if (!body.membreId || !body.date || !body.pasteur) throw createError({ statusCode: 400, message: 'Membre, date et pasteur requis' })
   return await prisma.visitePastorale.create({

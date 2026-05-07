@@ -1,6 +1,8 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 import bcrypt from 'bcryptjs'
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.ADMIN_PLUS)
   const body = await readBody(event)
   if (!body.email || !body.motDePasse || !body.nom || !body.prenom)
     throw createError({ statusCode: 400, message: 'Tous les champs sont requis' })

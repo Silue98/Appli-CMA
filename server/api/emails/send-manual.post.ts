@@ -1,7 +1,9 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 import { sendMail, emailTemplate } from '~/server/utils/mailer'
 
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.PASTORAL)
   const body = await readBody(event)
 
   if (!body.sujet || !body.message) {
@@ -12,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   if (body.cible === 'tous') {
     const membres = await prisma.membre.findMany({
-      where: { statut: 'ACTIF', email: { not: null } },
+      where: { statut: 'ACTIF', email: { not: null }, recevoirEmails: true },
       select: { email: true }
     })
     emails = membres.map((m: any) => m.email!).filter(Boolean)
@@ -22,6 +24,8 @@ export default defineEventHandler(async (event) => {
       include: { membre: { select: { email: true } } }
     })
     emails = membres.map((m: any) => m.membre.email!).filter(Boolean)
+  } else if (body.cible === 'liste' && body.emails?.length) {
+    emails = body.emails
   } else {
     throw createError({ statusCode: 400, message: 'Cible invalide' })
   }

@@ -1,8 +1,10 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 import { writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.GESTIONNAIRE)
   const body = await readBody(event)
 
   // Traitement de la photo si présente (base64)

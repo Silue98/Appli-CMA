@@ -11,6 +11,7 @@ export default defineEventHandler(async () => {
     where: {
       statut: 'ACTIF',
       email: { not: null },
+      recevoirEmails: true,
       dateNaissance: { not: null }
     },
     select: { id: true, email: true, prenom: true, nom: true, dateNaissance: true }

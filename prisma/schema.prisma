@@ -94,6 +94,7 @@ model Utilisateur {
   motDePasse String
   role       RoleUtilisateur  @default(SECRETAIRE)
   actif      Boolean          @default(true)
+  recevoirEmails Boolean       @default(true)
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
 }
@@ -156,6 +157,7 @@ model Membre {
   familleId             Int?
   famille               Famille?      @relation(fields: [familleId], references: [id])
   dateInscription       DateTime      @default(now())
+  recevoirEmails        Boolean       @default(true)
   updatedAt             DateTime      @updatedAt
   departements          MembreDepartement[]
   predications          Predication[] @relation("PredicationParMembre")
@@ -575,4 +577,14 @@ model EmailLog {
   statut        String   @default("ENVOYE")
   erreur        String?  @db.Text
   createdAt     DateTime @default(now())
+}
+
+model EmailConfig {
+  id        Int      @id @default(autoincrement())
+  host      String   @default("smtp.gmail.com")
+  port      Int      @default(587)
+  user      String   @default("")
+  pass      String   @default("")
+  from      String   @default("")
+  updatedAt DateTime @updatedAt
 }

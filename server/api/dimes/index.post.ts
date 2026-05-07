@@ -1,5 +1,7 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.FINANCES)
   const body = await readBody(event)
   return await prisma.dime.upsert({
     where: { membreId_mois_annee: { membreId: Number(body.membreId), mois: Number(body.mois), annee: Number(body.annee) } },

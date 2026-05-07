@@ -135,6 +135,50 @@
       </div>
     </div>
 
+    <!-- Gestion abonnements membres -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="font-semibold text-gray-800">👥 Abonnements membres</h3>
+          <p class="text-xs text-gray-400 mt-0.5">Gérez qui peut recevoir des emails</p>
+        </div>
+        <div class="flex gap-2">
+          <button @click="toutActiver" :disabled="loadingAbonnements" class="px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 text-xs rounded-lg border border-green-200 font-medium">✅ Tout activer</button>
+          <button @click="toutDesactiver" :disabled="loadingAbonnements" class="px-3 py-1.5 bg-red-50 text-red-700 hover:bg-red-100 text-xs rounded-lg border border-red-200 font-medium">🔕 Tout désactiver</button>
+        </div>
+      </div>
+
+      <input v-model="searchMembre" placeholder="🔍 Rechercher un membre..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-3 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+
+      <div class="text-xs text-gray-500 mb-2">
+        {{ membresAvecEmail.filter(m => m.recevoirEmails).length }} / {{ membresAvecEmail.length }} membres abonnés
+      </div>
+
+      <div v-if="loadingAbonnements" class="text-center py-4 text-gray-400">Chargement...</div>
+
+      <div v-else class="max-h-64 overflow-y-auto space-y-1">
+        <div v-for="m in membresFiltres" :key="m.id"
+          class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50">
+          <div class="flex items-center gap-2 min-w-0">
+            <div :class="['w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0', m.sexe === 'HOMME' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700']">
+              {{ m.prenom?.charAt(0) }}{{ m.nom?.charAt(0) }}
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-gray-800 truncate">{{ m.prenom }} {{ m.nom }}</p>
+              <p class="text-xs text-gray-400 truncate">{{ m.email }}</p>
+            </div>
+          </div>
+          <button @click="toggleMembreEmail(m)"
+            :class="['relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors ml-3', m.recevoirEmails ? 'bg-green-500' : 'bg-gray-300']">
+            <span :class="['inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform', m.recevoirEmails ? 'translate-x-4' : 'translate-x-1']"/>
+          </button>
+        </div>
+        <div v-if="membresFiltres.length === 0" class="text-center py-4 text-gray-400 text-sm">
+          Aucun membre avec email trouvé
+        </div>
+      </div>
+    </div>
+
     <!-- Formulaire envoi manuel -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
       <h3 class="font-semibold text-gray-800 mb-4">✉️ Envoyer un message libre</h3>
@@ -198,7 +242,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const settings = ref({
   autoEvenement: false, autoCulte: false, autoProgramme: false,
@@ -213,10 +257,59 @@ const sendResult = ref(null)
 const actionResult = ref(null)
 const loadings = ref({ rappels: false, dime: false, anniversaires: false })
 const form = ref({ cible: 'tous', departementId: '', sujet: '', message: '' })
+const membresAvecEmail = ref([])
+const searchMembre = ref('')
+const loadingAbonnements = ref(false)
+
+const membresFiltres = computed(() => {
+  if (!searchMembre.value) return membresAvecEmail.value
+  const s = searchMembre.value.toLowerCase()
+  return membresAvecEmail.value.filter(m =>
+    m.nom?.toLowerCase().includes(s) || m.prenom?.toLowerCase().includes(s) || m.email?.toLowerCase().includes(s)
+  )
+})
 
 onMounted(async () => {
-  await Promise.all([chargerSettings(), chargerDepartements(), chargerLogs()])
+  await Promise.all([chargerSettings(), chargerDepartements(), chargerLogs(), chargerMembres()])
 })
+
+async function chargerMembres() {
+  loadingAbonnements.value = true
+  try {
+    const data = await $fetch('/api/membres?limit=500')
+    membresAvecEmail.value = (data.membres || data).filter(m => m.email)
+  } catch (e) { console.error(e) } finally { loadingAbonnements.value = false }
+}
+
+async function toggleMembreEmail(m) {
+  try {
+    const result = await $fetch('/api/membres/toggle-email', { method: 'POST', body: { id: m.id } })
+    m.recevoirEmails = result.recevoirEmails
+  } catch (e) { console.error(e) }
+}
+
+async function toutActiver() {
+  loadingAbonnements.value = true
+  try {
+    await Promise.all(
+      membresAvecEmail.value.filter(m => !m.recevoirEmails).map(m =>
+        $fetch('/api/membres/toggle-email', { method: 'POST', body: { id: m.id } }).then(r => { m.recevoirEmails = r.recevoirEmails })
+      )
+    )
+  } catch (e) { console.error(e) } finally { loadingAbonnements.value = false }
+}
+
+async function toutDesactiver() {
+  if (!confirm('Désactiver les emails pour tous les membres ?')) return
+  loadingAbonnements.value = true
+  try {
+    await Promise.all(
+      membresAvecEmail.value.filter(m => m.recevoirEmails).map(m =>
+        $fetch('/api/membres/toggle-email', { method: 'POST', body: { id: m.id } }).then(r => { m.recevoirEmails = r.recevoirEmails })
+      )
+    )
+  } catch (e) { console.error(e) } finally { loadingAbonnements.value = false }
+}
 
 async function chargerSettings() {
   try { settings.value = await $fetch('/api/emails/settings') } catch (e) { console.error(e) }

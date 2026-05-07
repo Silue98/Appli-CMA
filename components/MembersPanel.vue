@@ -251,6 +251,7 @@
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Contact</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Groupe</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Inscrit le</th>
+              <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">📧 Emails</th>
               <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
             </tr>
           </thead>
@@ -276,6 +277,12 @@
                 <span v-else class="text-gray-400 text-xs">—</span>
               </td>
               <td class="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell">{{ formatDate(m.dateInscription) }}</td>
+              <td class="px-4 py-3 hidden md:table-cell text-center">
+                <button @click="toggleEmail(m)" :title="m.recevoirEmails ? 'Désactiver emails' : 'Activer emails'"
+                  :class="['relative inline-flex h-5 w-9 items-center rounded-full transition-colors', m.recevoirEmails ? 'bg-green-500' : 'bg-gray-300']">
+                  <span :class="['inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform', m.recevoirEmails ? 'translate-x-4' : 'translate-x-1']"/>
+                </button>
+              </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-end gap-1">
                   <button @click="ouvrirEdition(m)" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition" title="Modifier">
@@ -469,6 +476,18 @@ const sauvegarderMembre = async () => {
     formError.value = err.data?.message || err.message || 'Erreur lors de l\'enregistrement'
   } finally {
     isSaving.value = false
+  }
+}
+
+const toggleEmail = async (m) => {
+  try {
+    const result = await $fetch('/api/membres/toggle-email', {
+      method: 'POST',
+      body: { id: m.id }
+    })
+    m.recevoirEmails = result.recevoirEmails
+  } catch (e) {
+    console.error('Erreur toggle email:', e)
   }
 }
 

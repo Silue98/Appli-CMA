@@ -1,6 +1,8 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.FINANCES)
   const body = await readBody(event)
   if (!body.type) throw createError({ statusCode: 400, message: 'Le type est requis' })
   if (!body.montant || isNaN(Number(body.montant))) throw createError({ statusCode: 400, message: 'Le montant est requis' })

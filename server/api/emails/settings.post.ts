@@ -1,6 +1,8 @@
 import prisma from '~/server/utils/prisma'
+import { requireRole, ROLES } from '~/server/utils/auth'
 
 export default defineEventHandler(async (event) => {
+  requireRole(event, ROLES.ADMIN_PLUS)
   const body = await readBody(event)
   let settings = await prisma.emailSettings.findFirst()
 

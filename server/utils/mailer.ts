@@ -1,14 +1,27 @@
 import nodemailer from 'nodemailer'
+import prisma from '~/server/utils/prisma'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST || 'smtp.gmail.com',
-  port: Number(process.env.MAIL_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-  },
-})
+async function getTransporter() {
+  // Essayer d'abord la config depuis la DB
+  const config = await prisma.emailConfig.findFirst()
+
+  const host = config?.host || process.env.MAIL_HOST || 'smtp.gmail.com'
+  const port = config?.port || Number(process.env.MAIL_PORT) || 587
+  const user = config?.user || process.env.MAIL_USER || ''
+  const pass = config?.pass || process.env.MAIL_PASS || ''
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  })
+}
+
+async function getFrom() {
+  const config = await prisma.emailConfig.findFirst()
+  return config?.from || process.env.MAIL_FROM || `CMA DOKUI1 <${process.env.MAIL_USER}>`
+}
 
 export interface MailOptions {
   to: string | string[]
@@ -17,8 +30,11 @@ export interface MailOptions {
 }
 
 export async function sendMail(options: MailOptions) {
+  const transporter = await getTransporter()
+  const from = await getFrom()
+
   return await transporter.sendMail({
-    from: process.env.MAIL_FROM || `CMA Eglise <${process.env.MAIL_USER}>`,
+    from,
     to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
     subject: options.subject,
     html: options.html,

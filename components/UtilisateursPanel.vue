@@ -110,6 +110,11 @@
                 {{ roleLabel(u.role) }}
               </span>
               <span v-if="!u.actif" class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">Désactivé</span>
+              <button @click="toggleEmailUser(u)" :title="u.recevoirEmails ? 'Désactiver emails' : 'Activer emails'"
+                :class="['relative inline-flex h-5 w-9 items-center rounded-full transition-colors ml-1', u.recevoirEmails ? 'bg-green-500' : 'bg-gray-300']">
+                <span :class="['inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform', u.recevoirEmails ? 'translate-x-4' : 'translate-x-1']"/>
+              </button>
+              <span class="text-xs text-gray-400 ml-1">{{ u.recevoirEmails ? '📧' : '🔕' }}</span>
             </div>
             <p class="text-sm text-gray-500 mt-0.5">{{ u.email }}</p>
             <p class="text-xs text-gray-400 mt-0.5">Créé le {{ formatDate(u.createdAt) }}</p>
@@ -196,6 +201,18 @@ const fetchUsers = async () => {
 onMounted(fetchUsers)
 
 const toggleForm = () => { showForm.value = !showForm.value; if (!showForm.value) closeForm() }
+
+const toggleEmailUser = async (u) => {
+  try {
+    const result = await $fetch('/api/utilisateurs/toggle-email', {
+      method: 'POST',
+      body: { id: u.id }
+    })
+    u.recevoirEmails = result.recevoirEmails
+  } catch (e) {
+    console.error('Erreur toggle email:', e)
+  }
+}
 
 const closeForm = () => {
   showForm.value = false
