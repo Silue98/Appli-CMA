@@ -214,7 +214,11 @@ const notifierMembres = async (e) => {
       method: 'POST',
       body: { evenementId: e.id }
     })
-    alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+    if (result.success) {
+      alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+    } else {
+      alert(`ℹ️ ${result.message}`)
+    }
   } catch (err) {
     alert(`❌ Erreur : ${err.data?.message || err.message}`)
   } finally {

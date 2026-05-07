@@ -157,7 +157,11 @@ const notifierPredication = async (p) => {
   notifying.value = p.id
   try {
     const result = await $fetch('/api/emails/notify-predication', { method: 'POST', body: { predicationId: p.id } })
-    alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+    if (result.success) {
+      alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+    } else {
+      alert(`ℹ️ ${result.message}`)
+    }
   } catch (e) { alert(`❌ ${e.data?.message || e.message}`) }
   finally { notifying.value = null }
 }

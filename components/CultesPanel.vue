@@ -140,7 +140,11 @@ const notifierCulte = async (culte) => {
   notifying.value = culte.id
   try {
     const result = await $fetch('/api/emails/notify-culte', { method: 'POST', body: { culteId: culte.id } })
-    alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+    if (result.success) {
+      alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+    } else {
+      alert(`ℹ️ ${result.message}`)
+    }
   } catch (e) { alert(`❌ ${e.data?.message || e.message}`) }
   finally { notifying.value = null }
 }
