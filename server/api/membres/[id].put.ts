@@ -1,5 +1,5 @@
 import prisma from '~/server/utils/prisma'
-import { writeFileSync, mkdirSync } from 'fs'
+import { writeFileSync, mkdirSync, existsSync, unlinkSync } from 'fs'
 import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
@@ -18,9 +18,20 @@ export default defineEventHandler(async (event) => {
       if (matches && matches.length === 3) {
         let ext = matches[1] === 'jpeg' ? 'jpg' : matches[1]
         const buffer = Buffer.from(matches[2], 'base64')
-        const fileName = `${Date.now()}-${body.nom}_${body.prenom}.${ext}`
+        // Nettoyer le nom : supprimer accents, espaces, caracteres speciaux
+        const safeName = `${body.nom}_${body.prenom}`
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9_-]/g, '_')
+          .substring(0, 50)
+        const fileName = `${Date.now()}-${safeName}.${ext}`
         writeFileSync(join(mediaDir, fileName), buffer)
         photoPath = `/media/${fileName}`
+        // Supprimer l'ancienne photo pour eviter les fichiers orphelins
+        const existing = await prisma.membre.findUnique({ where: { id }, select: { photo: true } })
+        if (existing?.photo && existing.photo.startsWith('/media/')) {
+          const oldFile = join(process.cwd(), 'public', existing.photo)
+          if (existsSync(oldFile)) try { unlinkSync(oldFile) } catch {}
+        }
       }
     } catch (err) {
       console.error('Erreur sauvegarde photo:', err)
@@ -39,8 +50,10 @@ export default defineEventHandler(async (event) => {
   if (body.activiteAuSeinDP !== undefined) data.activiteAuSeinDP = body.activiteAuSeinDP || null
   if (body.situationMatrimoniale !== undefined) data.situationMatrimoniale = body.situationMatrimoniale || null
   if (body.dateNaissance !== undefined) data.dateNaissance = body.dateNaissance ? new Date(body.dateNaissance) : null
-  if (body.dateBaptemes !== undefined) data.dateBaptemes = body.dateBaptemes ? new Date(body.dateBaptemes) : null
-  if (body.dateEntreeAleglise !== undefined) data.dateEntreeAleglise = body.dateEntreeAleglise ? new Date(body.dateEntreeAleglise) : null
+  // Le formulaire envoie dateBaptemes → BDD : dateBaptemeEau
+  if (body.dateBaptemes !== undefined) data.dateBaptemeEau = body.dateBaptemes ? new Date(body.dateBaptemes) : null
+  // Le formulaire envoie dateEntreeAleglise → BDD : dateEntreeEglise
+  if (body.dateEntreeAleglise !== undefined) data.dateEntreeEglise = body.dateEntreeAleglise ? new Date(body.dateEntreeAleglise) : null
   if (body.dateEntreeDepartement !== undefined) data.dateEntreeDepartement = body.dateEntreeDepartement ? new Date(body.dateEntreeDepartement) : null
   if (photoPath !== undefined && !photoPath?.startsWith('data:')) data.photo = photoPath
 

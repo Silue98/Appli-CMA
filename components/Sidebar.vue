@@ -142,6 +142,7 @@ const menuGroups = [
     items: [
       { section: 'activites',     icon: '🎯', label: 'Activités',       roles: ['SUPER_ADMIN','ADMIN','PASTEUR','SECRETAIRE','LECTEUR'] },
       { section: 'utilisateurs',  icon: '👤', label: 'Utilisateurs',    roles: ['SUPER_ADMIN','ADMIN'] },
+      { section: 'inscriptions',  icon: '📝', label: 'Inscriptions',    roles: ['SUPER_ADMIN','ADMIN','SECRETAIRE'] },
     ]
   }
 ]

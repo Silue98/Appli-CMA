@@ -113,6 +113,7 @@
           <div v-else-if="activeSection === 'pastoral'"     key="pastoral">     <PastoralPanel/></div>
           <div v-else-if="activeSection === 'inventaire'"   key="inventaire">   <InventairePanel/></div>
           <div v-else-if="activeSection === 'benevoles'"    key="benevoles">    <BenevolesPanel/></div>
+          <div v-else-if="activeSection === 'inscriptions'" key="inscriptions"> <InscriptionPanel/></div>
         </transition>
       </main>
     </div>
@@ -128,7 +129,7 @@ const sectionTitles = {
   actes:'Actes Pastoraux', cultes:'Cultes', predications:'Prédications',
   programmes:'Programmes', impression:'Impression', annonces:'Annonces',
   presences:'Présences', evenements:'Événements', finances:'Finances',
-  dimes:'Dîmes', budgets:'Budgets', activites:'Activités', utilisateurs:'Utilisateurs'
+  dimes:'Dîmes', budgets:'Budgets', activites:'Activités', utilisateurs:'Utilisateurs', inscriptions:'📝 Inscriptions'
 }
 const actionsRapides = [
   { section:'membres',    icon:'👥', label:'Membres',    bg:'bg-green-600' },

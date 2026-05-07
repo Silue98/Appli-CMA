@@ -225,7 +225,11 @@ const form = reactive({
 // Pré-remplir si édition
 watch(() => props.existingData, (data) => {
   if (data) {
-    Object.keys(form).forEach(key => {
+    // Champs directs (meme nom entre form et BDD)
+    const directKeys = ['nom', 'prenom', 'sexe', 'dateNaissance', 'contact', 'email',
+      'adresse', 'situationMatrimoniale', 'profession', 'activiteAuSeinDP',
+      'dateEntreeDepartement']
+    directKeys.forEach(key => {
       if (data[key] !== undefined) {
         if (key.toLowerCase().includes('date') && data[key]) {
           form[key] = new Date(data[key]).toISOString().split('T')[0]
@@ -234,6 +238,14 @@ watch(() => props.existingData, (data) => {
         }
       }
     })
+    // Champs dont le nom differe entre le formulaire et la BDD
+    // BDD: dateEntreeEglise -> form: dateEntreeAleglise
+    form.dateEntreeAleglise = data.dateEntreeEglise
+      ? new Date(data.dateEntreeEglise).toISOString().split('T')[0] : ''
+    // BDD: dateBaptemeEau -> form: dateBaptemes
+    form.dateBaptemes = data.dateBaptemeEau
+      ? new Date(data.dateBaptemeEau).toISOString().split('T')[0] : ''
+
     if (data.photo) photoPreview.value = data.photo
   } else {
     Object.assign(form, {

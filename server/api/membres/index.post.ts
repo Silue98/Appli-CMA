@@ -17,7 +17,12 @@ export default defineEventHandler(async (event) => {
         let ext = matches[1] === 'jpeg' ? 'jpg' : matches[1]
         if (ext === 'svg+xml') ext = 'svg'
         const buffer = Buffer.from(matches[2], 'base64')
-        const fileName = `${Date.now()}-${body.nom}_${body.prenom}.${ext}`
+        // Nettoyer le nom : supprimer accents, espaces, caracteres speciaux
+        const safeName = `${body.nom}_${body.prenom}`
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9_-]/g, '_')
+          .substring(0, 50)
+        const fileName = `${Date.now()}-${safeName}.${ext}`
         writeFileSync(join(mediaDir, fileName), buffer)
         photoPath = `/media/${fileName}`
       }
@@ -32,9 +37,11 @@ export default defineEventHandler(async (event) => {
       prenom: body.prenom,
       sexe: body.sexe?.toUpperCase() as 'HOMME' | 'FEMME',
       dateNaissance: body.dateNaissance ? new Date(body.dateNaissance) : null,
-      dateBaptemeEau: body.dateBaptemeEau ? new Date(body.dateBaptemeEau) : null,         // ✅ était dateBaptemes
-      dateBaptemeEsprit: body.dateBaptemeEsprit ? new Date(body.dateBaptemeEsprit) : null, // ✅ nouveau champ séparé
-      dateEntreeEglise: body.dateEntreeEglise ? new Date(body.dateEntreeEglise) : null,    // ✅ était dateEntreeAleglise
+      // Le formulaire envoie dateBaptemes → BDD : dateBaptemeEau
+      dateBaptemeEau: body.dateBaptemes ? new Date(body.dateBaptemes) : null,
+      dateBaptemeEsprit: body.dateBaptemeEsprit ? new Date(body.dateBaptemeEsprit) : null,
+      // Le formulaire envoie dateEntreeAleglise → BDD : dateEntreeEglise
+      dateEntreeEglise: body.dateEntreeAleglise ? new Date(body.dateEntreeAleglise) : null,
       contact: body.contact || null,
       email: body.email || null,
       adresse: body.adresse || null,

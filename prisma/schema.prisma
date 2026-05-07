@@ -490,3 +490,51 @@ model ServiceBenevole {
   membre    Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
+// ═══════════════════════════════════════════════════════════════
+// INSCRIPTION PUBLIQUE
+// À ajouter à la fin de prisma/schema.prisma
+// ═══════════════════════════════════════════════════════════════
+
+enum StatutDemande {
+  EN_ATTENTE
+  ACCEPTE
+  REFUSE
+}
+
+model ConfigInscription {
+  id             Int      @id @default(autoincrement())
+  actif          Boolean  @default(false)
+  dateDebut      DateTime?
+  dateFin        DateTime?
+  messageOuvert  String?  @db.Text
+  messageFerme   String?  @db.Text
+  updatedAt      DateTime @updatedAt
+}
+
+// À remplacer dans prisma/schema.prisma
+// Uniquement le modèle DemandeInscription — le reste du schéma ne change pas
+
+model DemandeInscription {
+  id                    Int            @id @default(autoincrement())
+  nom                   String
+  prenom                String
+  sexe                  Sexe
+  dateNaissance         DateTime?
+  contact               String?
+  email                 String?
+  adresse               String?
+  situationMatrimoniale String?
+  profession            String?
+  photo                 String?
+
+  // ── Champs église & département (nouveaux) ──
+  dateEntreeAleglise    DateTime?
+  dateBaptemes          DateTime?
+  activiteAuSeinDP      String?
+  dateEntreeDepartement DateTime?
+
+  statut                StatutDemande  @default(EN_ATTENTE)
+  notesAdmin            String?        @db.Text
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+}
