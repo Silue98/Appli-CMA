@@ -538,3 +538,25 @@ model DemandeInscription {
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
 }
+
+// ═══════════════════════════════════════════
+// EMAIL SETTINGS & LOGS
+// ═══════════════════════════════════════════
+
+model EmailSettings {
+  id              Int      @id @default(autoincrement())
+  autoEnabled     Boolean  @default(false)
+  welcomeEnabled  Boolean  @default(true)
+  reminderEnabled Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model EmailLog {
+  id            Int      @id @default(autoincrement())
+  sujet         String
+  destinataires Int
+  type          String
+  statut        String   @default("ENVOYE")
+  erreur        String?  @db.Text
+  createdAt     DateTime @default(now())
+}

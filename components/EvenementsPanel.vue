@@ -132,6 +132,10 @@
               <p v-if="e.description" class="text-xs text-gray-400 mt-1 line-clamp-2">{{ e.description }}</p>
             </div>
             <div class="flex gap-1">
+              <button @click="notifierMembres(e)" :disabled="notifying === e.id" title="Notifier les membres" class="p-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition disabled:opacity-50">
+                <span v-if="notifying === e.id">⏳</span>
+                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              </button>
               <button @click="ouvrirEdition(e)" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
               </button>
@@ -199,6 +203,23 @@ const save = async () => {
     closeForm(); charger()
   } catch (e) { formError.value = e.data?.message || 'Erreur' }
   finally { isSaving.value = false }
+}
+
+const notifying = ref(null)
+const notifierMembres = async (e) => {
+  if (!confirm(`Envoyer une notification à tous les membres pour "${e.titre}" ?`)) return
+  notifying.value = e.id
+  try {
+    const result = await $fetch('/api/emails/notify-event', {
+      method: 'POST',
+      body: { evenementId: e.id }
+    })
+    alert(`✅ Notification envoyée à ${result.envoyes} membre(s) !`)
+  } catch (err) {
+    alert(`❌ Erreur : ${err.data?.message || err.message}`)
+  } finally {
+    notifying.value = null
+  }
 }
 
 const supprimer = async (e) => {

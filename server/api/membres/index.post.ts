@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
         let ext = matches[1] === 'jpeg' ? 'jpg' : matches[1]
         if (ext === 'svg+xml') ext = 'svg'
         const buffer = Buffer.from(matches[2], 'base64')
-        // Nettoyer le nom : supprimer accents, espaces, caracteres speciaux
         const safeName = `${body.nom}_${body.prenom}`
           .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
           .replace(/[^a-zA-Z0-9_-]/g, '_')
@@ -37,10 +36,8 @@ export default defineEventHandler(async (event) => {
       prenom: body.prenom,
       sexe: body.sexe?.toUpperCase() as 'HOMME' | 'FEMME',
       dateNaissance: body.dateNaissance ? new Date(body.dateNaissance) : null,
-      // Le formulaire envoie dateBaptemes → BDD : dateBaptemeEau
       dateBaptemeEau: body.dateBaptemes ? new Date(body.dateBaptemes) : null,
       dateBaptemeEsprit: body.dateBaptemeEsprit ? new Date(body.dateBaptemeEsprit) : null,
-      // Le formulaire envoie dateEntreeAleglise → BDD : dateEntreeEglise
       dateEntreeEglise: body.dateEntreeAleglise ? new Date(body.dateEntreeAleglise) : null,
       contact: body.contact || null,
       email: body.email || null,
@@ -52,6 +49,18 @@ export default defineEventHandler(async (event) => {
       photo: photoPath
     }
   })
+
+  // Envoyer email de bienvenue si le membre a un email
+  if (membre.email) {
+    try {
+      await $fetch('/api/emails/welcome-member', {
+        method: 'POST',
+        body: { membreId: membre.id }
+      })
+    } catch (e) {
+      console.error('Erreur email bienvenue:', e)
+    }
+  }
 
   return membre
 })
