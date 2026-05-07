@@ -1,5 +1,4 @@
 -- AlterTable
-ALTER TABLE `membre` ADD COLUMN `recevoirEmails` BOOLEAN NOT NULL DEFAULT true;
-
+ALTER TABLE `Membre` ADD COLUMN `recevoirEmails` BOOLEAN NOT NULL DEFAULT true;
 -- AlterTable
-ALTER TABLE `utilisateur` ADD COLUMN `recevoirEmails` BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE `Utilisateur` ADD COLUMN `recevoirEmails` BOOLEAN NOT NULL DEFAULT true;
