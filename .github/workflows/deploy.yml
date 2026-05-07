@@ -23,8 +23,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
       - name: Build Nuxt
-        run: npm run build
+        env:
+          DATABASE_URL: "mysql://user:password@localhost:3306/db"
+        run: npx nuxt build
 
   deploy:
     name: Deploy to Production
