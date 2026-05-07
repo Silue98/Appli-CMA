@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (!body.culteId) throw createError({ statusCode: 400, message: 'Le culte est requis' })
   if (!body.predicateurId) throw createError({ statusCode: 400, message: 'Le prédicateur est requis' })
 
-  return await prisma.predication.create({
+  const predication = await prisma.predication.create({
     data: {
       titre: body.titre,
       texteBiblique: body.texteBiblique || '',
@@ -18,4 +18,10 @@ export default defineEventHandler(async (event) => {
     },
     include: { culte: true, predicateur: true }
   })
+
+  try {
+    await $fetch('/api/emails/notify-predication', { method: 'POST', body: { predicationId: predication.id } })
+  } catch (e) { console.error('Email predication:', e) }
+
+  return predication
 })

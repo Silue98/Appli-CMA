@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   if (!body.date) throw createError({ statusCode: 400, message: 'La date est requise' })
 
-  return await prisma.programmeCulte.create({
+  const programme = await prisma.programmeCulte.create({
     data: {
       date: new Date(body.date),
       semaine: body.semaine || null,
@@ -32,4 +32,10 @@ export default defineEventHandler(async (event) => {
       roles: { include: { membre: true } }
     }
   })
+
+  try {
+    await $fetch('/api/emails/notify-programme', { method: 'POST', body: { programmeId: programme.id } })
+  } catch (e) { console.error('Email programme:', e) }
+
+  return programme
 })

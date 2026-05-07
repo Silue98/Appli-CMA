@@ -3,23 +3,15 @@ import prisma from '~/server/utils/prisma'
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   let settings = await prisma.emailSettings.findFirst()
+
+  const data: any = {}
+  const fields = ['autoEvenement','reminderEnabled','welcomeEnabled','autoCulte','autoAnnonce','autoProgramme','autoPredication','rappelDime','confirmInscription','notifPriere']
+  fields.forEach(f => { if (body[f] !== undefined) data[f] = body[f] })
+
   if (!settings) {
-    settings = await prisma.emailSettings.create({
-      data: {
-        autoEnabled: body.autoEnabled ?? false,
-        welcomeEnabled: body.welcomeEnabled ?? true,
-        reminderEnabled: body.reminderEnabled ?? true
-      }
-    })
+    settings = await prisma.emailSettings.create({ data: { ...data } })
   } else {
-    settings = await prisma.emailSettings.update({
-      where: { id: settings.id },
-      data: {
-        ...(body.autoEnabled !== undefined && { autoEnabled: body.autoEnabled }),
-        ...(body.welcomeEnabled !== undefined && { welcomeEnabled: body.welcomeEnabled }),
-        ...(body.reminderEnabled !== undefined && { reminderEnabled: body.reminderEnabled }),
-      }
-    })
+    settings = await prisma.emailSettings.update({ where: { id: settings.id }, data })
   }
   return settings
 })

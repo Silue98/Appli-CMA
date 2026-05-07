@@ -544,11 +544,27 @@ model DemandeInscription {
 // ═══════════════════════════════════════════
 
 model EmailSettings {
-  id              Int      @id @default(autoincrement())
-  autoEnabled     Boolean  @default(false)
-  welcomeEnabled  Boolean  @default(true)
-  reminderEnabled Boolean  @default(true)
-  updatedAt       DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  // Événements
+  autoEvenement         Boolean  @default(false)  // Auto à la création d'événement
+  reminderEnabled       Boolean  @default(true)   // Rappel J-1 événement
+  // Membres
+  welcomeEnabled        Boolean  @default(true)   // Bienvenue nouveau membre
+  // Cultes
+  autoCulte             Boolean  @default(false)  // Notification nouveau culte
+  // Annonces
+  autoAnnonce           Boolean  @default(false)  // Notification nouvelle annonce
+  // Programmes
+  autoProgramme         Boolean  @default(false)  // Nouveau programme publié
+  // Prédications
+  autoPredication       Boolean  @default(false)  // Nouvelle prédication publiée
+  // Dîmes
+  rappelDime            Boolean  @default(false)  // Rappel mensuel dîme
+  // Inscription publique
+  confirmInscription    Boolean  @default(true)   // Email confirmation inscription
+  // Demande de prière
+  notifPriere           Boolean  @default(false)  // Notifier admin nouvelle prière
+  updatedAt             DateTime @updatedAt
 }
 
 model EmailLog {

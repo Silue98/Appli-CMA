@@ -18,5 +18,10 @@ export default defineEventHandler(async (event) => {
     include: { departement: true }
   })
 
+  // Envoi auto si activé
+  try {
+    await $fetch('/api/emails/send-event', { method: 'POST', body: { evenementId: evenement.id } })
+  } catch (e) { console.error('Email événement auto:', e) }
+
   return evenement
 })

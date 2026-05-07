@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     body.compteRendu.assistanceTotale
   )
 
-  return await prisma.annonce.create({
+  const annonce = await prisma.annonce.create({
     data: {
       culteId: Number(body.culteId),
       titre: body.titre,
@@ -33,4 +33,10 @@ export default defineEventHandler(async (event) => {
     },
     include: { compteRendu: true, culte: true }
   })
+
+  try {
+    await $fetch('/api/emails/notify-annonce', { method: 'POST', body: { annonceId: annonce.id } })
+  } catch (e) { console.error('Email annonce:', e) }
+
+  return annonce
 })
