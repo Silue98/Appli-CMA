@@ -14,9 +14,7 @@ export default defineEventHandler(async (event) => {
   // Membres actifs avec email qui n'ont pas encore payé ce mois
   const membresSansDime = await prisma.membre.findMany({
     where: {
-      statut: 'ACTIF',
       email: { not: null },
-      recevoirEmails: true,
       dimes: {
         none: { mois, annee, paye: true }
       }

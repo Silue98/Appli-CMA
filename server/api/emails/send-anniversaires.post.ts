@@ -9,9 +9,7 @@ export default defineEventHandler(async () => {
   // Membres dont c'est l'anniversaire aujourd'hui
   const membres = await prisma.membre.findMany({
     where: {
-      statut: 'ACTIF',
       email: { not: null },
-      recevoirEmails: true,
       dateNaissance: { not: null }
     },
     select: { id: true, email: true, prenom: true, nom: true, dateNaissance: true }

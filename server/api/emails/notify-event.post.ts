@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
   // Récupérer tous les membres actifs avec email
   const membres = await prisma.membre.findMany({
-    where: { statut: 'ACTIF', email: { not: null }, recevoirEmails: true },
+    where: { email: { not: null } },
     select: { email: true }
   })
 

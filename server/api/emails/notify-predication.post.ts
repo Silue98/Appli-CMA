@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   if (!predication) throw createError({ statusCode: 404, message: 'Prédication non trouvée' })
 
   const membres = await prisma.membre.findMany({
-    where: { statut: 'ACTIF', email: { not: null }, recevoirEmails: true },
+    where: { email: { not: null } },
     select: { email: true }
   })
   const emails = membres.map((m: any) => m.email!).filter(Boolean)

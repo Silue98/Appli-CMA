@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (!evenement) throw createError({ statusCode: 404, message: 'Événement non trouvé' })
 
   const membres = await prisma.membre.findMany({
-    where: { statut: 'ACTIF', email: { not: null }, recevoirEmails: true },
+    where: { email: { not: null } },
     select: { email: true }
   })
   const emails = membres.map((m: any) => m.email!).filter(Boolean)
